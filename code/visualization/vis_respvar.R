@@ -1,41 +1,27 @@
 ## visualization of response variable distributions
-## 7.2.23, us
+## 9.2.23, us
 
 
 # setup -------------------------------------------------------------------
 library(tidyverse)
-folder_in <- "data/raw/nais_analysis/"
+library(cowplot)
+
+folder_in <- "data/processed/analysis/"
 folder_out <- "results/vis_respvar/"
 
 
 # load data ---------------------------------------------------------------
-LT <- read_rds(str_c(folder_in, "LT.rds")) %>% 
-  mutate(simtype = "LT")
-ST <- read_rds(str_c(folder_in, "ST.rds")) %>% 
-  mutate(simtype = "ST")
+comb <- read_rds(str_c(folder_in, "analysis_data_transf.rds"))
+respvar_names <- colnames(comb)[15:28]
+comb <- comb %>% 
+  pivot_longer(cols      = sha_i_MP_met_abs:sha_y_IP_met_diff,
+               names_to  = "resp_var",
+               values_to = "value") %>% 
+  mutate(resp_var = factor(resp_var, levels = respvar_names))
 
 
-# merge and pivot ---------------------------------------------------------
-comb <- bind_rows(LT, ST) %>% 
-  mutate(stratum = factor(stratum, levels = c("UM", "HM", "SA")),
-         quality = factor(quality),
-         init    = factor(init),
-         mgm     = factor(mgm, levels = c("NOM", "STS", "GRS1", "GRS2", "CAB1", "CAB2", "SC")),
-         nat_haz = factor(nat_haz),
-         simtype = factor(simtype),
-         q_site2 = case_when(q_site == 3 ~ "medium",
-                             TRUE        ~ "good"),
-         q_site2 = factor(q_site2, levels = c("medium", "good")),
-         q_reg2  = case_when(q_reg == 1 ~ "bad",
-                             TRUE       ~ "good"),
-         q_reg2  = factor(q_reg2, levels = c("bad", "good"))) %>% 
-  pivot_longer(cols = sha_y_MP_met:neg_dist_IP,
-               names_to = "resp_var",
-               values_to = "value")
-
-
-# plot --------------------------------------------------------------------
-# response variable distribution
+# plot response variable distributions ------------------------------------
+# all response variables
 ggplot(comb, aes(resp_var, value, color = simtype)) + 
   geom_boxplot() +
   labs(title = "Potential response variables",
@@ -44,12 +30,75 @@ ggplot(comb, aes(resp_var, value, color = simtype)) +
   theme(panel.grid.minor = element_blank(),
         axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 
-ggsave(str_c(folder_out, "0_resp_var_distr.png"))
+ggsave(str_c(folder_out, "0_resp_var_distr_all.png"))
 
-# mean_i_total
-data <- comb
-respvar <- "mean_i_total"
+# selected response variables (boxplots)
+comb_sel <- comb %>% 
+  filter(str_detect(resp_var, "sha_i_"))
 
+ggplot(comb_sel, aes(resp_var, value, color = simtype)) + 
+  geom_boxplot() +
+  labs(title = "Selected response variables",
+       x     = "response variable") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+
+ggsave(str_c(folder_out, "0_resp_var_distr_sel_1.png"))
+
+# selected response variables (density)
+p1 <- comb_sel %>% 
+  filter(str_detect(resp_var, "abs")) %>% 
+  ggplot(aes(value)) +
+  geom_density() +
+  geom_vline(aes(xintercept = min),
+             data = comb_sel %>% 
+               filter(str_detect(resp_var, "abs")) %>% 
+               group_by(simtype, resp_var) %>% 
+               summarise(min = min(value)),
+             lty = 2) +
+  geom_vline(aes(xintercept = max),
+             data = comb_sel %>% 
+               filter(str_detect(resp_var, "abs")) %>% 
+               group_by(simtype, resp_var) %>% 
+               summarise(max = max(value)),
+             lty = 2) +
+  facet_grid(rows = vars(simtype),
+             cols = vars(resp_var)) +
+  xlim(0, 1) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank())
+
+p2 <- comb_sel %>% 
+  filter(str_detect(resp_var, "diff")) %>% 
+  ggplot(aes(value)) +
+  geom_density() +
+  geom_vline(aes(xintercept = min),
+             data = comb_sel %>% 
+               filter(str_detect(resp_var, "diff")) %>% 
+               group_by(simtype, resp_var) %>% 
+               summarise(min = min(value)),
+             lty = 2) +
+  geom_vline(aes(xintercept = max),
+             data = comb_sel %>% 
+               filter(str_detect(resp_var, "diff")) %>% 
+               group_by(simtype, resp_var) %>% 
+               summarise(max = max(value)),
+             lty = 2) +
+  facet_grid(rows = vars(simtype),
+             cols = vars(resp_var)) +
+  xlim(-1, 1) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank())
+
+plot_grid(p1, p2,
+                ncol = 1)
+ggsave(str_c(folder_out, "0_resp_var_distr_sel_2.png"))
+
+
+
+
+# plot explanatory variables ----------------------------------------------
 plot_explvar <- function(respvar, data) {
   plots <- vector(mode = "list", length = 10)
   
@@ -102,7 +151,7 @@ plot_explvar <- function(respvar, data) {
           legend.position = "none")
   
   # mgm type
-  plots[[6]] <- ggplot(data_red, aes(mgm, value, color = simtype)) +
+  plots[[6]] <- ggplot(data_red, aes(mgm_type, value, color = simtype)) +
     geom_boxplot() +
     labs(title = "management type",
          y     = respvar) +
@@ -149,12 +198,11 @@ plot_explvar <- function(respvar, data) {
   return(gg)
 }
 
-
-vars <- unique(comb$resp_var)
+vars <- as.character(unique(comb_sel$resp_var))
 
 for (i in seq_along(vars)) {
   gg <- plot_explvar(respvar = vars[i],
-                     data    = comb)
+                     data    = comb_sel)
   ggsave(str_c(folder_out, vars[i], ".jpg"),
          plot = gg,
          scale = 1.5)
