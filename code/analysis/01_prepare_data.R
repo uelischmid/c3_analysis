@@ -17,38 +17,29 @@ LT_orig <- read_rds(str_c(folder_in, "LT.rds")) %>%
 ST_orig <- read_rds(str_c(folder_in, "ST.rds")) %>% 
   mutate(simtype = "ST")
 
-comb_orig <- bind_rows(LT_orig, ST_orig)
+comb_orig <- bind_rows(LT_orig, ST_orig) %>% 
+  select(-c(sha_y_MP_met, sha_y_IP_met, mean_i_total, neg_dist_MP, neg_dist_IP))
 
 
 # calculate alternative response variable (diff NOM) ----------------------
 comb_mgm <- comb_orig %>% 
   filter(mgm != "NOM") %>% 
-  rename_with(~ str_c(.x, "_abs"), c(sha_y_MP_met:neg_dist_IP))
+  rename_with(~ str_c(.x, "_abs"), c(sha_i_MP_met, sha_i_IP_met))
 comb_nom <- comb_orig %>% 
   filter(mgm == "NOM") %>% 
-  rename_with(~ str_c(.x, "_NOM"), c(sha_y_MP_met:neg_dist_IP)) %>% 
+  rename_with(~ str_c(.x, "_NOM"), c(sha_i_MP_met, sha_i_IP_met)) %>% 
   select(-c(mgm, mgm_interval, mgm_intensity))
 
 comb <- left_join(comb_mgm, comb_nom, by = c("stratum",
                                              "quality", "q_site", "q_reg",
                                              "init", "nat_haz", "simtype")) %>% 
-  mutate(sha_y_MP_met_diff = sha_y_MP_met_abs - sha_y_MP_met_NOM,
-         sha_y_IP_met_diff = sha_y_IP_met_abs - sha_y_IP_met_NOM,
-         sha_i_MP_met_diff = sha_i_MP_met_abs - sha_i_MP_met_NOM,
-         sha_i_IP_met_diff = sha_i_IP_met_abs - sha_i_IP_met_NOM,
-         mean_i_total_diff = mean_i_total_abs - mean_i_total_NOM,
-         neg_dist_MP_diff  = neg_dist_MP_abs - neg_dist_MP_NOM,
-         neg_dist_IP_diff  = neg_dist_IP_abs - neg_dist_IP_NOM) %>% 
+  mutate(sha_i_MP_met_diff = sha_i_MP_met_abs - sha_i_MP_met_NOM,
+         sha_i_IP_met_diff = sha_i_IP_met_abs - sha_i_IP_met_NOM) %>% 
   select(simtype, nat_haz, stratum:mgm_intensity,
          sha_i_MP_met_abs, sha_i_MP_met_diff,
-         sha_i_IP_met_abs, sha_i_IP_met_diff,
-         neg_dist_MP_abs, neg_dist_MP_diff,
-         neg_dist_IP_abs, neg_dist_IP_diff,
-         mean_i_total_abs, mean_i_total_diff,
-         sha_y_MP_met_abs, sha_y_MP_met_diff,
-         sha_y_IP_met_abs, sha_y_IP_met_diff)
-
-
+         sha_i_IP_met_abs, sha_i_IP_met_diff) %>% 
+  mutate(sha_i_MP_met_diff_t = (sha_i_MP_met_diff + 1) / 2,
+         sha_i_IP_met_diff_t = (sha_i_IP_met_diff + 1) / 2)
 
 
 # convert response variables ----------------------------------------------
@@ -81,7 +72,7 @@ comb <- comb %>%
          quality, q_site, q_site2, q_reg, q_reg2,
          init,
          mgm_type = mgm, mgm_interval, mgm_interval_s, mgm_intensity, mgm_intensity_s,
-         sha_i_MP_met_abs:sha_y_IP_met_diff)
+         sha_i_MP_met_abs:sha_i_IP_met_diff_t)
 
 # save --------------------------------------------------------------------
 write_rds(comb,
