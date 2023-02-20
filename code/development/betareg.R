@@ -24,3 +24,20 @@ fe2 <- FoodExpenditure %>%
 
 
 
+tibble(x       = seq(0.01, 0.99, 0.01),
+       logit   = log(x / (1 - x)),
+       cloglog = log(-log(1 - x)),
+       log     = log(x),
+       loglog  = -log(-log(x))) %>% 
+  pivot_longer(cols = c(logit:loglog),
+               names_to = "linkfun") %>% 
+  ggplot(aes(x, value, group = linkfun, color = linkfun)) +
+  geom_line()
+
+tibble(x       = seq(0.01, 0.99, 0.01),
+       logit   = log(x / (1 - x)),
+       cloglog = log(-log(1 - x))) %>% 
+  pivot_longer(cols = c(logit:cloglog),
+               names_to = "linkfun") %>% 
+  ggplot(aes(x, value, group = linkfun, color = linkfun)) +
+  geom_line()
