@@ -5,7 +5,6 @@
 # setup -------------------------------------------------------------------
 library(tidyverse)
 library(betareg)
-# library(broom)
 library(effects)
 
 folder_in_d <- "data/processed/analysis/"
@@ -48,7 +47,8 @@ for (i in seq_along(models)) {
                         pull(vals, nat_haz), "_",
                         pull(vals, profile), "_",
                         pull(vals, resp_var_type), "_",
-                        "f", pull(vals, formula_nr), ".jpg"),
+                        "f", pull(vals, formula_nr), "_",
+                        pull(vals, link), ".jpg"),
        width    = 1000,
        height   = 700)
   plot(allEffects(mod = models[[i]]))
@@ -59,7 +59,8 @@ for (i in seq_along(models)) {
                         pull(vals, nat_haz), "_",
                         pull(vals, profile), "_",
                         pull(vals, resp_var_type), "_",
-                        "f", pull(vals, formula_nr), ".jpg"),
+                        "f", pull(vals, formula_nr), "_",
+                        pull(vals, link), ".jpg"),
        width    = 1000,
        height   = 700)
   plot(allEffects(mod = models[[i]]),
