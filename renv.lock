@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.0.5",
+    "Version": "4.1.0",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -366,6 +366,13 @@
       "Repository": "CRAN",
       "Hash": "15e9634c0fcd294799e9b2e929ed1b86"
     },
+    "ggeffects": {
+      "Package": "ggeffects",
+      "Version": "1.1.5",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "fde9b23ced5dcea02fea6d7f46f1eb87"
+    },
     "ggplot2": {
       "Package": "ggplot2",
       "Version": "3.4.0",
@@ -527,6 +534,13 @@
       "Repository": "CRAN",
       "Hash": "7ce2733a9826b3aeb1775d56fd305472"
     },
+    "margins": {
+      "Package": "margins",
+      "Version": "0.3.26",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "a7719c7b7989be666f8049e7d087fbea"
+    },
     "memoise": {
       "Package": "memoise",
       "Version": "2.0.1",
@@ -645,6 +659,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "a555924add98c99d2f411e37e7d25e9f"
+    },
+    "prediction": {
+      "Package": "prediction",
+      "Version": "0.3.14",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "0711ff44a086709b9b7441267ab303bf"
     },
     "prettyunits": {
       "Package": "prettyunits",
