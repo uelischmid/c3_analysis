@@ -1,4 +1,4 @@
-## analyize data with beta regression
+## analyze data with beta regression
 ## 20.2.23, us
 
 
