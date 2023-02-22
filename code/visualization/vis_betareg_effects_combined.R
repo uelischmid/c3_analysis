@@ -142,7 +142,7 @@ plot_effects_comb <- function(st, rvt, fn,
     geom_point(position = position_dodge(width = 0.2)) +
     geom_errorbar(aes(ymin = conf.low,
                       ymax = conf.high),
-                  width = 0.25,
+                  width    = 0.25,
                   position = position_dodge(width = 0.2)) +
     labs(x     = "Stratum",
          y     = "Profile met (%)",
@@ -162,7 +162,7 @@ plot_effects_comb <- function(st, rvt, fn,
     geom_point(position = position_dodge(width = 0.2)) +
     geom_errorbar(aes(ymin = conf.low,
                       ymax = conf.high),
-                  width = 0.25,
+                  width    = 0.25,
                   position = position_dodge(width = 0.2)) +
     labs(x = "Stratum",
          y = " ") +
@@ -186,7 +186,7 @@ plot_effects_comb <- function(st, rvt, fn,
     geom_point(position = position_dodge(width = 0.2)) +
     geom_errorbar(aes(ymin = conf.low,
                       ymax = conf.high),
-                  width = 0.25,
+                  width    = 0.25,
                   position = position_dodge(width = 0.2)) +
     labs(x        = expression(Q[site]),
          y        = "Profile met (%)",
@@ -209,7 +209,7 @@ plot_effects_comb <- function(st, rvt, fn,
     geom_point(position = position_dodge(width = 0.2)) +
     geom_errorbar(aes(ymin = conf.low,
                       ymax = conf.high),
-                  width = 0.25,
+                  width    = 0.25,
                   position = position_dodge(width = 0.2)) +
     labs(x = expression(Q[site]),
          y = " ") +
@@ -232,7 +232,7 @@ plot_effects_comb <- function(st, rvt, fn,
     geom_point(position = position_dodge(width = 0.2)) +
     geom_errorbar(aes(ymin = conf.low,
                       ymax = conf.high),
-                  width = 0.25,
+                  width    = 0.25,
                   position = position_dodge(width = 0.2)) +
     labs(x     = "Type",
          y     = "Profile met (%)",
@@ -252,7 +252,7 @@ plot_effects_comb <- function(st, rvt, fn,
     geom_point(position = position_dodge(width = 0.2)) +
     geom_errorbar(aes(ymin = conf.low,
                       ymax = conf.high),
-                  width = 0.25,
+                  width    = 0.25,
                   position = position_dodge(width = 0.2)) +
     labs(x = "Type",
          y = " ") +
@@ -274,11 +274,12 @@ plot_effects_comb <- function(st, rvt, fn,
     filter(profile == "MP") %>% 
     ggplot(aes(x, predicted, color = nat_haz)) +
     geom_ribbon(aes(x, predicted,
-                    ymin = conf.low, ymax = conf.high,
+                    ymin = conf.low,
+                    ymax = conf.high,
                     fill = nat_haz),
-                alpha = 0.2, color = NA,
+                alpha       = 0.2,
+                color       = NA,
                 inherit.aes = FALSE) +
-    # geom_line(linewidth = 1.5) +
     geom_line() +
     labs(x     = "Interval (y)",
          y     = "Profile met (%)",
@@ -297,11 +298,12 @@ plot_effects_comb <- function(st, rvt, fn,
     filter(profile == "IP") %>% 
     ggplot(aes(x, predicted, color = nat_haz)) +
     geom_ribbon(aes(x, predicted,
-                    ymin = conf.low, ymax = conf.high,
+                    ymin = conf.low,
+                    ymax = conf.high,
                     fill = nat_haz),
-                alpha = 0.2, color = NA,
+                alpha       = 0.2,
+                color       = NA,
                 inherit.aes = FALSE) +
-    # geom_line(linewidth = 1.5) +
     geom_line() +
     labs(x = "Interval (y)",
          y = " ") +
@@ -323,11 +325,12 @@ plot_effects_comb <- function(st, rvt, fn,
     filter(profile == "MP") %>% 
     ggplot(aes(x, predicted, color = nat_haz)) +
     geom_ribbon(aes(x, predicted,
-                    ymin = conf.low, ymax = conf.high,
+                    ymin = conf.low,
+                    ymax = conf.high,
                     fill = nat_haz),
-                alpha = 0.2, color = NA,
+                alpha       = 0.2,
+                color       = NA,
                 inherit.aes = FALSE) +
-    # geom_line(linewidth = 1.5) +
     geom_line() +
     labs(x     = "Intensity (%)",
          y     = "Profile met (%)",
@@ -346,11 +349,12 @@ plot_effects_comb <- function(st, rvt, fn,
     filter(profile == "IP") %>% 
     ggplot(aes(x, predicted, color = nat_haz)) +
     geom_ribbon(aes(x, predicted,
-                    ymin = conf.low, ymax = conf.high,
+                    ymin = conf.low,
+                    ymax = conf.high,
                     fill = nat_haz),
-                alpha = 0.2, color = NA,
+                alpha       = 0.2,
+                color       = NA,
                 inherit.aes = FALSE) +
-    # geom_line(linewidth = 1.5) +
     geom_line() +
     labs(x = "Intensity (%)",
          y = " ") +
@@ -364,21 +368,22 @@ plot_effects_comb <- function(st, rvt, fn,
   
   if (fn == 3) {
     # plot int-int-interaction (x = intensity)
-    effs_mgm_interaction1 <- get_eff(mod = m_all,
-                                    mc = mc_used,
-                                    term = c("mgm_intensity [10:40]",
-                                             "mgm_interval [10, 20, 30, 40]")) %>% 
+    effs_mgm_interaction1 <- get_eff(mod  = m_all,
+                                     mc   = mc_used,
+                                     term = c("mgm_intensity [10:40]",
+                                              "mgm_interval [10, 20, 30, 40]")) %>% 
       rename(Interval = group)
     
     gg_MP_temp <- effs_mgm_interaction1 %>% 
       filter(profile == "MP") %>% 
       ggplot(aes(x, predicted, color = nat_haz)) +
       geom_ribbon(aes(x, predicted,
-                      ymin = conf.low, ymax = conf.high,
+                      ymin = conf.low,
+                      ymax = conf.high,
                       fill = nat_haz),
-                  alpha = 0.2, color = NA,
+                  alpha       = 0.2,
+                  color       = NA,
                   inherit.aes = FALSE) +
-      # geom_line(linewidth = 1.5) +
       geom_line() +
       facet_wrap(~Interval,
                  labeller = "label_both") +
@@ -399,11 +404,12 @@ plot_effects_comb <- function(st, rvt, fn,
       filter(profile == "IP") %>% 
       ggplot(aes(x, predicted, color = nat_haz)) +
       geom_ribbon(aes(x, predicted,
-                      ymin = conf.low, ymax = conf.high,
+                      ymin = conf.low,
+                      ymax = conf.high,
                       fill = nat_haz),
-                  alpha = 0.2, color = NA,
+                  alpha       = 0.2,
+                  color       = NA,
                   inherit.aes = FALSE) +
-      # geom_line(linewidth = 1.5) +
       geom_line() +
       facet_wrap(~Interval,
                  labeller = "label_both") +
@@ -421,21 +427,22 @@ plot_effects_comb <- function(st, rvt, fn,
     
     
     # plot int-int-interaction (x = interval)
-    effs_mgm_interaction2 <- get_eff(mod = m_all,
-                                    mc = mc_used,
-                                    term = c("mgm_interval [10:40]",
-                                             "mgm_intensity [10, 20, 30, 40]")) %>% 
+    effs_mgm_interaction2 <- get_eff(mod  = m_all,
+                                     mc   = mc_used,
+                                     term = c("mgm_interval [10:40]",
+                                              "mgm_intensity [10, 20, 30, 40]")) %>% 
       rename(Intensity = group)
     
     gg_MP_temp <- effs_mgm_interaction2 %>% 
       filter(profile == "MP") %>% 
       ggplot(aes(x, predicted, color = nat_haz)) +
       geom_ribbon(aes(x, predicted,
-                      ymin = conf.low, ymax = conf.high,
+                      ymin = conf.low,
+                      ymax = conf.high,
                       fill = nat_haz),
-                  alpha = 0.2, color = NA,
+                  alpha       = 0.2,
+                  color       = NA,
                   inherit.aes = FALSE) +
-      # geom_line(linewidth = 1.5) +
       geom_line() +
       facet_wrap(~Intensity,
                  labeller = "label_both") +
@@ -456,11 +463,12 @@ plot_effects_comb <- function(st, rvt, fn,
       filter(profile == "IP") %>% 
       ggplot(aes(x, predicted, color = nat_haz)) +
       geom_ribbon(aes(x, predicted,
-                      ymin = conf.low, ymax = conf.high,
+                      ymin = conf.low,
+                      ymax = conf.high,
                       fill = nat_haz),
-                  alpha = 0.2, color = NA,
+                  alpha       = 0.2,
+                  color       = NA,
                   inherit.aes = FALSE) +
-      # geom_line(linewidth = 1.5) +
       geom_line() +
       facet_wrap(~Intensity,
                  labeller = "label_both") +
@@ -475,17 +483,14 @@ plot_effects_comb <- function(st, rvt, fn,
       theme(legend.position = "none")
     
     # plots[[32]] <- get_legend(gg_MP_temp)
-    
   }
   
   
   # plot together
-  
   if (fn %in% c(1, 2)) {
     gg_out <- plot_grid(plotlist    = plots,
                         align       = "h",
                         axis        = "lr",
-                        # nrow        = 6,
                         ncol        = 4,
                         rel_heights = c(0.25, rep(1, 5)),
                         rel_widths  = c(0.15, 1, 1, 0.4))
@@ -493,12 +498,10 @@ plot_effects_comb <- function(st, rvt, fn,
     gg_out <- plot_grid(plotlist    = plots,
                         align       = "h",
                         axis        = "lr",
-                        # nrow        = 6,
                         ncol        = 4,
                         rel_heights = c(0.25, rep(1, 7)),
                         rel_widths  = c(0.15, 1, 1, 0.4))
   }
-  
   
   return(gg_out)
 }
@@ -515,11 +518,11 @@ p <- plot_effects_comb(st     = "LT",
                        mc_all = model_combinations)
 
 ggsave(filename = str_c(folder_out, "LT_abs_f1.jpg"),
-       plot = p,
-       width = 20,
-       height = 30,
-       units = "cm",
-       scale = 1)
+       plot     = p,
+       width    = 20,
+       height   = 30,
+       units    = "cm",
+       scale    = 1)
 
 
 # LT diff
@@ -532,11 +535,11 @@ p <- plot_effects_comb(st     = "LT",
                        mc_all = model_combinations)
 
 ggsave(filename = str_c(folder_out, "LT_diff_f1.jpg"),
-       plot = p,
-       width = 20,
-       height = 30,
-       units = "cm",
-       scale = 1)
+       plot     = p,
+       width    = 20,
+       height   = 30,
+       units    = "cm",
+       scale    = 1)
 
 
 # ST abs
@@ -549,11 +552,11 @@ p <- plot_effects_comb(st     = "ST",
                        mc_all = model_combinations)
 
 ggsave(filename = str_c(folder_out, "ST_abs_f2.jpg"),
-       plot = p,
-       width = 20,
-       height = 30,
-       units = "cm",
-       scale = 1)
+       plot     = p,
+       width    = 20,
+       height   = 30,
+       units    = "cm",
+       scale    = 1)
 
 
 # ST diff
@@ -566,9 +569,9 @@ p <- plot_effects_comb(st     = "ST",
                        mc_all = model_combinations)
 
 ggsave(filename = str_c(folder_out, "ST_diff_f2.jpg"),
-       plot = p,
-       width = 20,
-       height = 30,
-       units = "cm",
-       scale = 1)
+       plot     = p,
+       width    = 20,
+       height   = 30,
+       units    = "cm",
+       scale    = 1)
 
