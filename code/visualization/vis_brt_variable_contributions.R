@@ -54,8 +54,8 @@ plot_vi <- function(m_all, mc_all,
     pull(var)
   
   contributions <- contributions %>% 
-    mutate(var = factor(var, levels = var_order),
-           var = fct_rev(var),
+    mutate(var   = factor(var, levels = var_order),
+           var   = fct_rev(var),
            label = factor(label, levels = c("A - MP", "A - IP", "LED - MP", "LED - IP")),
            label = fct_rev(label))
   
@@ -64,10 +64,10 @@ plot_vi <- function(m_all, mc_all,
   gg_p <- ggplot(contributions, aes(var, rel.inf, fill = label)) +
     geom_col(position = "dodge") +
     coord_flip() +
-    scale_y_continuous(name = "Variable importance (%)") +
     scale_fill_discrete(guide = guide_legend(reverse = TRUE)) +
     labs(title = title_str,
-         x = NULL) +
+         x     = NULL,
+         y     = "Variable importance (%)") +
     theme_bw() +
     theme(panel.grid.minor = element_blank())
   
