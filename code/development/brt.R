@@ -50,6 +50,9 @@ data_ST_LED <- data_analysis %>%
 
 # build model -------------------------------------------------------------
 # LT A abs MP
+
+# LT A abs MP model -------------------------------------------------------
+set.seed(1)
 m_LT_A_abs_MP <- gbm.step(data            = data_LT_A,
                           gbm.x           = c(3, 6, 8, 10, 11, 13),
                           gbm.y           = 15,
@@ -58,14 +61,16 @@ m_LT_A_abs_MP <- gbm.step(data            = data_LT_A,
                           learning.rate   = 0.05,
                           bag.fraction    = 0.75)
 
+set.seed(1)
 m_LT_A_abs_MP_UM <- gbm.step(data            = data_LT_A_UM,
                              gbm.x           = c(6, 8, 10, 11, 13),
                              gbm.y           = 15,
                              family          = "gaussian",
                              tree.complexity = 4,
-                             learning.rate   = 0.01,
+                             learning.rate   = 0.03,
                              bag.fraction    = 0.75)
 
+set.seed(1)
 m_LT_A_abs_MP_HM <- gbm.step(data            = data_LT_A_HM,
                              gbm.x           = c(6, 8, 10, 11, 13),
                              gbm.y           = 15,
@@ -74,6 +79,7 @@ m_LT_A_abs_MP_HM <- gbm.step(data            = data_LT_A_HM,
                              learning.rate   = 0.01,
                              bag.fraction    = 0.75)
 
+set.seed(1)
 m_LT_A_abs_MP_SA <- gbm.step(data            = data_LT_A_SA,
                              gbm.x           = c(6, 8, 10, 11, 13),
                              gbm.y           = 15,
@@ -83,7 +89,83 @@ m_LT_A_abs_MP_SA <- gbm.step(data            = data_LT_A_SA,
                              bag.fraction    = 0.75)
 
 
-# logit-transformed response
+# summaries
+summary(m_LT_A_abs_MP)
+summary(m_LT_A_abs_MP_UM) # intensity moves 1 up
+summary(m_LT_A_abs_MP_HM) # q_reg dominates
+summary(m_LT_A_abs_MP_SA) # interval and intensity on top
+
+
+# plot
+gbm.plot(m_LT_A_abs_MP,
+         n.plots     = 6,
+         plot.layout = c(2, 3),
+         write.title = FALSE)
+gbm.plot(m_LT_A_abs_MP_UM,
+         n.plots     = 5,
+         plot.layout = c(2, 3),
+         write.title = FALSE)
+gbm.plot(m_LT_A_abs_MP_HM,
+         n.plots     = 5,
+         plot.layout = c(2, 3),
+         write.title = FALSE)
+gbm.plot(m_LT_A_abs_MP_SA,
+         n.plots     = 5,
+         plot.layout = c(2, 3),
+         write.title = FALSE)
+
+# interactions
+m_int <- gbm.interactions(m_LT_A_abs_MP)
+m_int$rank.list
+m_int$interactions
+
+m_int_UM <- gbm.interactions(m_LT_A_abs_MP_UM)
+m_int_UM$rank.list
+
+m_int_HM <- gbm.interactions(m_LT_A_abs_MP_HM)
+m_int_HM$rank.list
+
+m_int_SA <- gbm.interactions(m_LT_A_abs_MP_SA)
+m_int_SA$rank.list
+
+# full model, interval vs. stratum
+gbm.perspec(m_LT_A_abs_MP,
+            x = 1,
+            y = 5,
+            z.range = c(0.1, 0.7))
+
+# full model: interval vs. intensity
+gbm.perspec(m_LT_A_abs_MP,
+            x = 5,
+            y = 6,
+            z.range = c(0, 0.3))
+
+# UM: interval vs. intensity
+gbm.perspec(m_LT_A_abs_MP_UM,
+            x = 5,
+            y = 4,
+            z.range = c(0, 0.6))
+
+# UM: interval vs. mgm type
+gbm.perspec(m_LT_A_abs_MP_UM,
+            x = 3,
+            y = 4,
+            z.range = c(0, 0.6))
+
+# HM: interval vs. intensity
+gbm.perspec(m_LT_A_abs_MP_HM,
+            x = 5,
+            y = 4,
+            z.range = c(0, 0.3))
+
+# SA: interval vs. intensity
+gbm.perspec(m_LT_A_abs_MP_SA,
+            x = 5,
+            y = 4,
+            z.range = c(0.4, 0.7))
+
+
+# LT A abs MP model with logit transformation -----------------------------
 m_LT_A_abs_MP_transf <- gbm.step(data            = data_LT_A,
                                  gbm.x           = c(3, 6, 8, 10, 11, 13),
                                  gbm.y           = 21,
@@ -116,13 +198,9 @@ m_LT_A_abs_MP_SA_transf <- gbm.step(data            = data_LT_A_SA,
                                     learning.rate   = 0.01,
                                     bag.fraction    = 0.75)
 
-# summaries
-summary(m_LT_A_abs_MP)
-summary(m_LT_A_abs_MP_UM) # intensity moves 1 up
-summary(m_LT_A_abs_MP_HM) # type moves 1 up, site moves 1 up
-summary(m_LT_A_abs_MP_SA) # interval and intensity on top
 
-# comparison to transformed
+
+# comparison to untransformed
 m_LT_A_abs_MP$cv.statistics$correlation.mean
 m_LT_A_abs_MP_transf$cv.statistics$correlation.mean
 
@@ -137,34 +215,15 @@ m_LT_A_abs_MP_SA_transf$cv.statistics$correlation.mean
 
 
 # plot all
-gbm.plot(m_LT_A_abs_MP,
-         n.plots     = 6,
-         plot.layout = c(2, 3),
-         write.title = FALSE)
-gbm.plot(m_LT_A_abs_MP_UM,
-         n.plots     = 5,
-         plot.layout = c(2, 3),
-         write.title = FALSE)
-gbm.plot(m_LT_A_abs_MP_HM,
-         n.plots     = 5,
-         plot.layout = c(2, 3),
-         write.title = FALSE)
-gbm.plot(m_LT_A_abs_MP_SA,
-         n.plots     = 5,
-         plot.layout = c(2, 3),
-         write.title = FALSE)
-
-
+source("code/visualization/gbm.plot_us.R")
 gbm.plot(m_LT_A_abs_MP_transf,
          n.plots     = 6,
          plot.layout = c(2, 3),
          write.title = FALSE)
-source("code/visualization/gbm.plot_us.R")
 gbm.plot_us_invlogit(m_LT_A_abs_MP_transf,
                      n.plots     = 6,
                      plot.layout = c(2, 3),
                      write.title = FALSE)
-
 
 gbm.plot(m_LT_A_abs_MP_UM_transf,
          n.plots     = 5,
@@ -180,48 +239,6 @@ gbm.plot(m_LT_A_abs_MP_SA_transf,
          write.title = FALSE)
 
 
-
-m_int <- gbm.interactions(m_LT_A_abs_MP)
-m_int$rank.list
-m_int$interactions
-
-m_int_UM <- gbm.interactions(m_LT_A_abs_MP_UM)
-m_int_UM$rank.list
-
-m_int_HM <- gbm.interactions(m_LT_A_abs_MP_HM)
-m_int_HM$rank.list
-
-m_int_SA <- gbm.interactions(m_LT_A_abs_MP_SA)
-m_int_SA$rank.list
-
-gbm.perspec(m_LT_A_abs_MP,
-            x = 1,
-            y = 5,
-            z.range = c(0.1, 0.7))
-gbm.perspec(m_LT_A_abs_MP,
-            x = 5,
-            y = 6,
-            z.range = c(0, 0.3))
-
-gbm.perspec(m_LT_A_abs_MP_UM,
-            x = 5,
-            y = 4,
-            z.range = c(0, 0.6))
-
-gbm.perspec(m_LT_A_abs_MP_UM,
-            x = 3,
-            y = 4,
-            z.range = c(0, 0.6))
-
-gbm.perspec(m_LT_A_abs_MP_HM,
-            x = 5,
-            y = 4,
-            z.range = c(0, 0.3))
-
-gbm.perspec(m_LT_A_abs_MP_SA,
-            x = 5,
-            y = 4,
-            z.range = c(0.4, 0.7))
 
 # for (i in seq_along(data_LT_A)) {
 #   cat(i, ": ", colnames(data_LT_A)[i], "\n")
