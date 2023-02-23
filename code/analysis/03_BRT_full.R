@@ -76,4 +76,5 @@ for (i in seq_along(models_full)) {
 
 write_rds(models_full,
           str_c(folder_out, "models_full.rds"))
-
+write_rds(model_combinations,
+          str_c(folder_out, "model_combinations_full.rds"))

@@ -94,4 +94,5 @@ for (i in seq_along(models_stratum)) {
 
 write_rds(models_stratum,
           str_c(folder_out, "models_stratum.rds"))
-
+write_rds(model_combinations,
+          str_c(folder_out, "model_combinations_stratum.rds"))
