@@ -1,4 +1,4 @@
-## visualize residuals of betareg-models
+## diagnostic plots of betareg-models
 ## 22.2.23, us
 
 
@@ -8,7 +8,7 @@ library(betareg)
 
 folder_in_d <- "data/processed/nais_analysis_data/"
 folder_in_m <- "data/processed/betareg_models_v1/"
-folder_out <- "results/vis_models_v1/betareg/vis_betareg_residuals/"
+folder_out <- "results/vis_models_v1/betareg/vis_betareg_diagnostics/"
 
 
 # load data ---------------------------------------------------------------
