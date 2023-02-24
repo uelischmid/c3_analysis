@@ -1,4 +1,4 @@
-## visualization of LT
+## visualization of ST
 ## 6.2.23, us
 
 # setup -------------------------------------------------------------------
@@ -6,19 +6,19 @@ library(tidyverse)
 library(cowplot)
 
 folder_in <- "data/raw/nais_analysis/"
-folder_out <- "results/raw_data/vis_LT/"
+folder_out <- "results/raw_data/vis_ST/"
 
-source("code/visualization/vis_functions.R")
+source("code/02_visualization/vis_functions.R")
 
 
 # load and prepare data ---------------------------------------------------
-analysis_LT_orig <- read_rds(str_c(folder_in, "LT.rds"))
-LT <- prep_data(analysis_LT_orig)
+analysis_ST_orig <- read_rds(str_c(folder_in, "ST.rds"))
+ST <- prep_data(analysis_ST_orig)
 
 
 # plot --------------------------------------------------------------------
 plot_combinations <- expand_grid(stratum = c("UM", "HM", "SA"),
-                                 init    = "LT",
+                                 init    = c("1", "2", "3"),
                                  nat_haz = c("A", "LED"),
                                  resp_var = c("sha_y_MP_met", "sha_i_MP_met",
                                               "sha_y_IP_met", "sha_i_IP_met",
@@ -33,9 +33,10 @@ for (i in 1:nrow(plot_combinations)) {
                              init_sel     = plot_combinations[[i, "init"]],
                              nathaz_sel   = plot_combinations[[i, "nat_haz"]],
                              resp_var_sel = plot_combinations[[i, "resp_var"]],
-                             res          = LT)
-  ggsave(filename = str_c(folder_out, "LT_",
-                          plot_combinations[[i, "stratum"]], "_",
+                             res          = ST)
+  ggsave(filename = str_c(folder_out, "ST_",
+                          plot_combinations[[i, "stratum"]], "_init",
+                          plot_combinations[[i, "init"]], "_",
                           plot_combinations[[i, "nat_haz"]], "_",
                           plot_combinations[[i, "resp_var"]], "_4cs.jpg"),
          plot = gg_4cs)
@@ -46,10 +47,11 @@ for (i in 1:nrow(plot_combinations)) {
                              init_sel     = plot_combinations[[i, "init"]],
                              nathaz_sel   = plot_combinations[[i, "nat_haz"]],
                              resp_var_sel = plot_combinations[[i, "resp_var"]],
-                             res          = LT)
+                             res          = ST)
   
-  ggsave(filename = str_c(folder_out, "LT_",
-                          plot_combinations[[i, "stratum"]], "_",
+  ggsave(filename = str_c(folder_out, "ST_",
+                          plot_combinations[[i, "stratum"]], "_init",
+                          plot_combinations[[i, "init"]], "_",
                           plot_combinations[[i, "nat_haz"]], "_",
                           plot_combinations[[i, "resp_var"]], "_1cs.jpg"),
          plot = gg_1cs)
