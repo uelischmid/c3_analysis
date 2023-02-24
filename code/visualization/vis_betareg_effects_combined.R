@@ -46,11 +46,22 @@ get_eff <- function(mod, mc, term) {
   
   for (i in 1:nrow(mc)) {
     vals <- mc[i, ]
-    effs[[i]] <- ggeffect(model = mod[[pull(vals, rowid)]],
-                          terms = term) %>% 
+    eff <- ggeffect(model = mod[[pull(vals, rowid)]],
+                    terms = term) %>% 
       as_tibble() %>% 
       mutate(nat_haz = pull(vals, nat_haz),
              profile = pull(vals, profile))
+    
+    # backtransform for diff-models
+    if (pull(vals, resp_var_type) == "diff") {
+      eff <- eff %>% 
+        mutate(predicted = 2 * predicted - 1,
+               std.error = 2 * std.error - 1,
+               conf.low  = 2 * conf.low - 1,
+               conf.high = 2 * conf.high - 1)
+    }
+    
+    effs[[i]] <- eff
   }
   effs <- bind_rows(effs)
   return(effs)
@@ -95,6 +106,7 @@ plot_effects_comb <- function(st, rvt, fn,
   theme_custom <- theme_bw() +
     theme(panel.grid.minor = element_blank())
   
+  
   if (yl_MP[2] - yl_MP[1] < 0.1) {
     yb_MP <- seq(yl_MP[1], yl_MP[2], 0.02)
   } else if (yl_MP[2] - yl_MP[1] < 0.3) {
@@ -111,6 +123,21 @@ plot_effects_comb <- function(st, rvt, fn,
     yb_IP <- seq(yl_IP[1], yl_IP[2], 0.1)
   }
   
+  if (rvt == "abs") {
+    label_y <- "Profile met (%)"
+    scale_y_custom_MP <- scale_y_continuous(limits = yl_MP,
+                                            breaks = yb_MP,
+                                            labels = scales::percent)
+    scale_y_custom_IP <- scale_y_continuous(limits = yl_IP,
+                                            breaks = yb_IP,
+                                            labels = scales::percent)
+  } else {
+    label_y <- "PQ difference"
+    scale_y_custom_MP <- scale_y_continuous(limits = yl_MP,
+                                            breaks = yb_MP)
+    scale_y_custom_IP <- scale_y_continuous(limits = yl_IP,
+                                            breaks = yb_IP)
+  }
   
   # name plots
   p_title_MP <- plot_profilename("Minimal Profile")
@@ -137,11 +164,12 @@ plot_effects_comb <- function(st, rvt, fn,
                   width    = 0.25,
                   position = position_dodge(width = 0.2)) +
     labs(x     = "Stratum",
-         y     = "Profile met (%)",
+         y     = label_y,
          color = "Natural\nhazard") +
-    scale_y_continuous(limits = yl_MP,
-                       breaks = yb_MP,
-                       labels = scales::percent) +
+    # scale_y_continuous(limits = yl_MP,
+    #                    breaks = yb_MP,
+    #                    labels = scales::percent) +
+    scale_y_custom_MP +
     theme_custom +
     theme(legend.justification = "top")
   
@@ -158,9 +186,10 @@ plot_effects_comb <- function(st, rvt, fn,
                   position = position_dodge(width = 0.2)) +
     labs(x = "Stratum",
          y = " ") +
-    scale_y_continuous(limits = yl_IP,
-                       breaks = yb_IP,
-                       labels = scales::percent) +
+    # scale_y_continuous(limits = yl_IP,
+    #                    breaks = yb_IP,
+    #                    labels = scales::percent) +
+    scale_y_custom_IP +
     theme_custom +
     theme(legend.position = "none")
   
@@ -182,13 +211,14 @@ plot_effects_comb <- function(st, rvt, fn,
                   width    = 0.25,
                   position = position_dodge(width = 0.2)) +
     labs(x        = expression(Q[site]),
-         y        = "Profile met (%)",
+         y        = label_y,
          color    = "Natural\nhazard",
          shape    = expression(Q[reg]),
          linetype = expression(Q[reg])) +
-    scale_y_continuous(limits = yl_MP,
-                       breaks = yb_MP,
-                       labels = scales::percent) +
+    # scale_y_continuous(limits = yl_MP,
+    #                    breaks = yb_MP,
+    #                    labels = scales::percent) +
+    scale_y_custom_MP +
     theme_custom +
     scale_color_discrete(guide = "none") +
     theme(legend.justification = "top")
@@ -206,9 +236,10 @@ plot_effects_comb <- function(st, rvt, fn,
                   position = position_dodge(width = 0.2)) +
     labs(x = expression(Q[site]),
          y = " ") +
-    scale_y_continuous(limits = yl_IP,
-                       breaks = yb_IP,
-                       labels = scales::percent) +
+    # scale_y_continuous(limits = yl_IP,
+    #                    breaks = yb_IP,
+    #                    labels = scales::percent) +
+    scale_y_custom_IP +
     theme_custom +
     theme(legend.position = "none")
   
@@ -230,11 +261,12 @@ plot_effects_comb <- function(st, rvt, fn,
                     width    = 0.25,
                     position = position_dodge(width = 0.2)) +
       labs(x     = "Init",
-           y     = "Profile met (%)",
+           y     = label_y,
            color = "Natural\nhazard") +
-      scale_y_continuous(limits = yl_MP,
-                         breaks = yb_MP,
-                         labels = scales::percent) +
+      # scale_y_continuous(limits = yl_MP,
+      #                    breaks = yb_MP,
+      #                    labels = scales::percent) +
+      scale_y_custom_MP +
       theme_custom +
       theme(legend.justification = "top")
     
@@ -251,9 +283,10 @@ plot_effects_comb <- function(st, rvt, fn,
                     position = position_dodge(width = 0.2)) +
       labs(x = "Init",
            y = " ") +
-      scale_y_continuous(limits = yl_IP,
-                         breaks = yb_IP,
-                         labels = scales::percent) +
+      # scale_y_continuous(limits = yl_IP,
+      #                    breaks = yb_IP,
+      #                    labels = scales::percent) +
+      scale_y_custom_IP +
       theme_custom +
       theme(legend.position = "none")
   }
@@ -273,11 +306,12 @@ plot_effects_comb <- function(st, rvt, fn,
                   width    = 0.25,
                   position = position_dodge(width = 0.2)) +
     labs(x     = "Type",
-         y     = "Profile met (%)",
+         y     = label_y,
          color = "Natural\nhazard") +
-    scale_y_continuous(limits = yl_MP,
-                       breaks = yb_MP,
-                       labels = scales::percent) +
+    # scale_y_continuous(limits = yl_MP,
+    #                    breaks = yb_MP,
+    #                    labels = scales::percent) +
+    scale_y_custom_MP +
     theme_custom +
     theme(legend.justification = "top")
   
@@ -294,9 +328,10 @@ plot_effects_comb <- function(st, rvt, fn,
                   position = position_dodge(width = 0.2)) +
     labs(x = "Type",
          y = " ") +
-    scale_y_continuous(limits = yl_IP,
-                       breaks = yb_IP,
-                       labels = scales::percent) +
+    # scale_y_continuous(limits = yl_IP,
+    #                    breaks = yb_IP,
+    #                    labels = scales::percent) +
+    scale_y_custom_IP +
     theme_custom +
     theme(legend.position = "none")
   
@@ -318,12 +353,13 @@ plot_effects_comb <- function(st, rvt, fn,
                 inherit.aes = FALSE) +
     geom_line() +
     labs(x     = "Interval (y)",
-         y     = "Profile met (%)",
+         y     = label_y,
          color = "Natural\nhazard",
          fill  = "Natural\nhazard") +
-    scale_y_continuous(limits = yl_MP,
-                       breaks = yb_MP,
-                       labels = scales::percent) +
+    # scale_y_continuous(limits = yl_MP,
+    #                    breaks = yb_MP,
+    #                    labels = scales::percent) +
+    scale_y_custom_MP +
     theme_custom +
     theme(legend.justification = "top")
   
@@ -343,9 +379,10 @@ plot_effects_comb <- function(st, rvt, fn,
     geom_line() +
     labs(x = "Interval (y)",
          y = " ") +
-    scale_y_continuous(limits = yl_IP,
-                       breaks = yb_IP,
-                       labels = scales::percent) +
+    # scale_y_continuous(limits = yl_IP,
+    #                    breaks = yb_IP,
+    #                    labels = scales::percent) +
+    scale_y_custom_IP +
     theme_custom +
     theme(legend.position = "none")
   
@@ -369,12 +406,13 @@ plot_effects_comb <- function(st, rvt, fn,
                 inherit.aes = FALSE) +
     geom_line() +
     labs(x     = "Intensity (%)",
-         y     = "Profile met (%)",
+         y     = label_y,
          color = "Natural\nhazard",
          fill  = "Natural\nhazard") +
-    scale_y_continuous(limits = yl_MP,
-                       breaks = yb_MP,
-                       labels = scales::percent) +
+    # scale_y_continuous(limits = yl_MP,
+    #                    breaks = yb_MP,
+    #                    labels = scales::percent) +
+    scale_y_custom_MP +
     theme_custom +
     theme(legend.justification = "top")
   
@@ -394,9 +432,10 @@ plot_effects_comb <- function(st, rvt, fn,
     geom_line() +
     labs(x = "Intensity (%)",
          y = " ") +
-    scale_y_continuous(limits = yl_IP,
-                       breaks = yb_IP,
-                       labels = scales::percent) +
+    # scale_y_continuous(limits = yl_IP,
+    #                    breaks = yb_IP,
+    #                    labels = scales::percent) +
+    scale_y_custom_IP +
     theme_custom +
     theme(legend.position = "none")
   
@@ -487,8 +526,8 @@ ggsave(filename = str_c(folder_out, "LT_abs_f1.jpg"),
 p <- plot_effects_comb(st     = "LT",
                        rvt    = "diff",
                        fn     = 1,
-                       yl_MP  = c(0.4, 0.55),
-                       yl_IP  = c(0.45, 0.6),
+                       yl_MP  = c(-0.2, 0.1),
+                       yl_IP  = c(-0.2, 0.2),
                        m_all  = models,
                        mc_all = model_combinations)
 
@@ -521,8 +560,8 @@ ggsave(filename = str_c(folder_out, "ST_abs_f2.jpg"),
 p <- plot_effects_comb(st     = "ST",
                        rvt    = "diff",
                        fn     = 2,
-                       yl_MP  = c(0.42, 0.49),
-                       yl_IP  = c(0.44, 0.5),
+                       yl_MP  = c(-0.2, 0),
+                       yl_IP  = c(-0.2, 0),
                        m_all  = models,
                        mc_all = model_combinations)
 
