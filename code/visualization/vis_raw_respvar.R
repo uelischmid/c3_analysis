@@ -7,7 +7,7 @@ library(tidyverse)
 library(cowplot)
 
 folder_in <- "data/processed/analysis/"
-folder_out <- "results/vis_respvar/"
+folder_out <- "results/raw_data/vis_respvar/"
 
 
 # load data ---------------------------------------------------------------

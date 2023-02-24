@@ -6,7 +6,7 @@ library(tidyverse)
 library(cowplot)
 
 folder_in <- "data/raw/nais_analysis/"
-folder_out <- "results/vis_ST/"
+folder_out <- "results/raw_data/vis_ST/"
 
 source("code/visualization/vis_functions.R")
 
