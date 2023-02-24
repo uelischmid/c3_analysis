@@ -1,5 +1,5 @@
 ## analyze data with beta regression
-## full models
+## models with reduced data: LT
 ## 24.2.23, us
 
 
@@ -13,31 +13,35 @@ folder_out <- "data/processed/betareg_models_v2/"
 
 
 # load data ---------------------------------------------------------------
-data_analysis <- read_rds(str_c(folder_in, "analysis_data_transf.rds"))
+data_analysis <- read_rds(str_c(folder_in, "analysis_data_transf.rds")) %>% 
+  filter(q_reg2 == "normal")
 
-data_LT_A <- data_analysis %>% 
-  filter(simtype == "LT") %>% 
-  filter(nat_haz == "A")
+# subset data and save as new objects
+data_comb <- expand_grid(simtype = "LT",
+                         nat_haz = c("A", "LED"),
+                         stratum = c("UM", "HM", "SA"))
+for (i in 1:nrow(data_comb)) {
+  vals <- data_comb[i,]
+  object_name <- str_c("data_",
+                       pull(vals, simtype), "_",
+                       pull(vals, nat_haz), "_",
+                       pull(vals, stratum))
+  object_content <- data_analysis %>% 
+    filter(simtype == pull(vals, simtype)) %>% 
+    filter(nat_haz == pull(vals, nat_haz)) %>% 
+    filter(stratum == pull(vals, stratum))
+  
+  assign(object_name, object_content)
+}
 
-data_LT_LED <- data_analysis %>% 
-  filter(simtype == "LT") %>% 
-  filter(nat_haz == "LED")
-
-data_ST_A <- data_analysis %>% 
-  filter(simtype == "ST") %>% 
-  filter(nat_haz == "A")
-
-data_ST_LED <- data_analysis %>% 
-  filter(simtype == "ST") %>% 
-  filter(nat_haz == "LED")
-
-
+rm(object_name, object_content)
 
 # prepare models ----------------------------------------------------------
-model_combinations <- expand_grid(simtype       = c("LT", "ST"),
+model_combinations <- expand_grid(simtype       = "LT",
                                   nat_haz       = c("A", "LED"),
                                   profile       = c("MP", "IP"),
-                                  resp_var_type = c("abs", "diff"))
+                                  resp_var_type = c("abs", "diff"),
+                                  stratum       = c("UM", "HM", "SA"))
 
 models <- vector(mode = "list", length = nrow(model_combinations))
 glances <- models
@@ -64,17 +68,15 @@ for (i in 1:nrow(model_combinations)) {
   }
   
   # formula
-  if (pull(vals, simtype) == "LT") {
-    m_formula <- str_c(m_resp_var, " ~ ",
-                       "stratum + q_site2 * q_reg2 + mgm_type + mgm_interval * mgm_intensity + I(mgm_interval^2) + I(mgm_intensity^2)")
-  } else {
-    m_formula <- str_c(m_resp_var, " ~ ",
-                       "stratum + q_site2 * q_reg2 + init + mgm_type + mgm_interval * mgm_intensity + I(mgm_interval^2) + I(mgm_intensity^2)")
-  }
+  m_formula <- str_c(m_resp_var, " ~ ",
+                     "q_site2 + mgm_type + mgm_interval * mgm_intensity + I(mgm_interval^2) + I(mgm_intensity^2)")
   m_formula <- as.formula(m_formula)
   
   # data
-  m_data <- str_c("data_", pull(vals, simtype), "_", pull(vals, nat_haz))
+  m_data <- str_c("data_",
+                  pull(vals, simtype), "_",
+                  pull(vals, nat_haz), "_",
+                  pull(vals, stratum))
   
   # link
   m_link <- "logit"
@@ -98,12 +100,12 @@ glances <- bind_rows(glances)
 
 
 # plot r squared ----------------------------------------------------------
-ggplot(glances, aes(simtype, pseudo.r.squared)) +
+ggplot(glances, aes(nat_haz, pseudo.r.squared)) +
   geom_boxplot() +
   facet_wrap(~resp_var_type)
 
 
 # save model data ---------------------------------------------------------
-write_rds(models, str_c(folder_out, "models_full.rds"))
-write_rds(glances, str_c(folder_out, "glances_full.rds"))
-write_rds(model_combinations, str_c(folder_out, "model_combinations_full.rds"))
+write_rds(models, str_c(folder_out, "models_red_LT.rds"))
+write_rds(glances, str_c(folder_out, "glances_red_LT.rds"))
+write_rds(model_combinations, str_c(folder_out, "model_combinations_red_LT.rds"))
