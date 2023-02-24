@@ -74,6 +74,11 @@ for (i in seq_along(models_full)) {
                                bag.fraction    = pull(vals, bag_fraction))
 }
 
+
+for (i in seq_along(models_full)) {
+  attr(models_full[[i]]$Terms, ".Environment") <- NULL
+}
+
 write_rds(models_full,
           str_c(folder_out, "models_full.rds"))
 write_rds(model_combinations,

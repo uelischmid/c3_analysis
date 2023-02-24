@@ -92,6 +92,10 @@ for (i in seq_along(models_stratum)) {
                  bag.fraction    = pull(vals, bag_fraction))
 }
 
+for (i in seq_along(models_stratum)) {
+  attr(models_stratum[[i]]$Terms, ".Environment") <- NULL
+}
+
 write_rds(models_stratum,
           str_c(folder_out, "models_stratum.rds"))
 write_rds(model_combinations,
