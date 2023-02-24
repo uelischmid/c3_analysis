@@ -52,7 +52,7 @@ tibble(x       = seq(0.01, 0.99, 0.01),
 library(margins)
 library(effects)
 
-data_LT_A <- read_rds("data/processed/analysis/analysis_data_transf.rds") %>% 
+data_LT_A <- read_rds("data/processed/nais_analysis_data/analysis_data_transf.rds") %>% 
   filter(simtype == "LT") %>% 
   filter(nat_haz == "A") %>% 
   mutate(mgm_interval_10  = mgm_interval / 10,
@@ -96,7 +96,7 @@ rm(data_LT_A, e, m1, m1_m, m2)
 library(effects)
 library(ggeffects)
 
-data_LT_A <- read_rds("data/processed/analysis/analysis_data_transf.rds") %>% 
+data_LT_A <- read_rds("data/processed/nais_analysis_data/analysis_data_transf.rds") %>% 
   filter(simtype == "LT") %>% 
   filter(nat_haz == "A") %>% 
   mutate(mgm_interval_10  = mgm_interval / 10,

@@ -8,7 +8,7 @@ library(betareg)
 library(broom)
 library(effects)
 
-folder_in <- "data/processed/analysis/"
+folder_in <- "data/processed/nais_analysis_data/"
 folder_out <- "data/processed/betareg_models_v1/"
 
 

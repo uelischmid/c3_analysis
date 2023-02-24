@@ -7,7 +7,7 @@ library(tidyverse)
 library(betareg)
 library(margins)
 
-folder_in_d <- "data/processed/analysis/"
+folder_in_d <- "data/processed/nais_analysis_data/"
 folder_in_m <- "data/processed/betareg_models_v1/"
 folder_out <- "results/vis_models_v1/betareg/vis_betareg_marginal_effects_combined/"
 

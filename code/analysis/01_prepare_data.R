@@ -7,8 +7,8 @@
 # setup -------------------------------------------------------------------
 library(tidyverse)
 
-folder_in <- "data/raw/nais_analysis/"
-folder_out <- "data/processed/analysis/"
+folder_in <- "data/raw/nais_analysis_data/"
+folder_out <- "data/processed/nais_analysis_data/"
 
 
 # load data ---------------------------------------------------------------

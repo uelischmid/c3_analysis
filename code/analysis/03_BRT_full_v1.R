@@ -7,7 +7,7 @@ library(tidyverse)
 library(gbm)
 library(dismo)
 
-folder_in <- "data/processed/analysis/"
+folder_in <- "data/processed/nais_analysis_data/"
 folder_out <- "data/processed/brt_models_v1/"
 
 
