@@ -8,7 +8,7 @@ library(betareg)
 library(margins)
 
 folder_in_d <- "data/processed/analysis/"
-folder_in_m <- "results/betareg_models/"
+folder_in_m <- "data/processed/betareg_models/"
 folder_out <- "results/vis_betareg_marginal_effects_combined/"
 
 

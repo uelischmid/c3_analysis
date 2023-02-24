@@ -8,7 +8,7 @@ library(gbm)
 library(dismo)
 library(cowplot)
 
-folder_in <- "results/brt_models/"
+folder_in <- "data/processed/brt_models/"
 folder_out <- "results/vis_brt_varcont_stratum/"
 
 

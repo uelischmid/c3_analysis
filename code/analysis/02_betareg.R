@@ -9,7 +9,7 @@ library(broom)
 library(effects)
 
 folder_in <- "data/processed/analysis/"
-folder_out <- "results/betareg_models/"
+folder_out <- "data/processed/betareg_models/"
 
 
 # load data ---------------------------------------------------------------
