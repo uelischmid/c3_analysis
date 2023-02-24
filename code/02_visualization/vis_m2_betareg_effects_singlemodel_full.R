@@ -1,15 +1,14 @@
-## diagnostic plots of betareg-models
-## full models
+## visualize effects of betareg full models v2
 ## 24.2.23, us
-
 
 # setup -------------------------------------------------------------------
 library(tidyverse)
-library(betareg)
+library(ggeffects)
+library(cowplot)
 
 folder_in_d <- "data/processed/nais_analysis_data/"
 folder_in_m <- "data/processed/betareg_models_v2/"
-folder_out <- "results/vis_models_v2/betareg/vis_betareg_full_diagnostics/"
+folder_out <- "results/vis_models_v2/betareg/vis_betareg_full_effects_singlemodel/"
 
 
 # load data ---------------------------------------------------------------
@@ -38,18 +37,18 @@ model_combinations <- read_rds(str_c(folder_in_m, "model_combinations_full.rds")
   rowid_to_column()
 
 
-# plot --------------------------------------------------------------------
+# plot effects ------------------------------------------------------------
 for (i in 1:nrow(model_combinations)) {
-  vars <- model_combinations[i,]
+  vals <- model_combinations[i,]
+  mod <- models[[i]]
   
-  jpeg(filename = str_c(folder_out,
-                        pull(vars, simtype), "_",
-                        pull(vars, nat_haz), "_",
-                        pull(vars, profile), "_",
-                        pull(vars, resp_var_type), ".jpg"),
-       width = 1000,
-       height = 1000)
-  par(mfrow = c(2, 2))
-  plot(models[[pull(vars, rowid)]], which = 1:4)
-  dev.off()
+  effs <- ggeffect(model = mod)
+  eff_plots <- plot(effs)
+  comb_plot <- plot_grid(plotlist = eff_plots)
+  ggsave(str_c(folder_out,
+               pull(vals, simtype), "_",
+               pull(vals, nat_haz), "_",
+               pull(vals, profile), "_",
+               pull(vals, resp_var_type), ".jpg"),
+         scale = 1.5)
 }
