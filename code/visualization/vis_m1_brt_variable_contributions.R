@@ -7,7 +7,7 @@ library(tidyverse)
 library(gbm)
 library(dismo)
 
-folder_in <- "data/processed/brt_models/"
+folder_in <- "data/processed/brt_models_v1/"
 folder_out <- "results/vis_models_v1/brt/vis_brt_varcont/"
 
 # load data ---------------------------------------------------------------

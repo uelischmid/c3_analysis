@@ -9,7 +9,7 @@ library(dismo)
 library(cowplot)
 library(gridGraphics)
 
-folder_in <- "data/processed/brt_models/"
+folder_in <- "data/processed/brt_models_v1/"
 folder_out <- "results/vis_models_v1/brt/vis_brt_mgm/"
 
 

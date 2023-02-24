@@ -8,7 +8,7 @@ library(gbm)
 library(dismo)
 
 folder_in <- "data/processed/analysis/"
-folder_out <- "data/processed/brt_models/"
+folder_out <- "data/processed/brt_models_v1/"
 
 
 # load data ---------------------------------------------------------------
