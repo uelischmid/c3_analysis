@@ -59,13 +59,21 @@ for(a in 1:nrow(model_combinations_full)) {
            var     = fct_rev(var),
            stratum = factor(stratum, levels = c("combined", "UM", "HM", "SA")))
   
+  cont_mgm <- cont_all %>% 
+    mutate(mgm_var = case_when(var %in% c("Type", "Interval", "Intensity") ~ "mgm",
+                               TRUE                                        ~ "other")) %>% 
+    group_by(stratum, mgm_var) %>% 
+    summarise(rel.inf.sum = sum(rel.inf),
+              .groups     = "drop") %>% 
+    mutate(stratum = fct_rev(stratum))
+  
   title_str <- str_c(pull(mc_full, simtype),
                      pull(mc_full, nat_haz),
                      pull(mc_full, profile),
                      pull(mc_full, resp_var_type),
                      sep = " ")
-  
-  p <- ggplot(cont_all, aes(var, rel.inf)) +
+  # all variables
+  p1 <- ggplot(cont_all, aes(var, rel.inf)) +
     geom_col() +
     coord_flip() +
     facet_wrap(~stratum,
@@ -80,7 +88,25 @@ for(a in 1:nrow(model_combinations_full)) {
   ggsave(filename = str_c(folder_out,
                           str_replace_all(title_str, " ", "_"),
                           ".png"),
-         plot     = p)
+         plot     = p1)
+  
+  # mgm
+  p2 <- cont_mgm %>% 
+    filter(mgm_var == "mgm") %>% 
+    ggplot(aes(stratum, rel.inf.sum)) +
+    geom_col() +
+    scale_y_continuous(limits = c(0, 100)) +
+    coord_flip() +
+    labs(title = title_str,
+         x     = NULL,
+         y     = "Importance of management (%)") +
+    theme_bw() +
+    theme(panel.grid.minor = element_blank())
+  
+  ggsave(filename = str_c(folder_out,
+                          str_replace_all(title_str, " ", "_"),
+                          "_mgm.png"),
+         plot     = p2)
 }
 
 
