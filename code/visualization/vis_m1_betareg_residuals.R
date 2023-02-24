@@ -8,7 +8,7 @@ library(betareg)
 
 folder_in_d <- "data/processed/analysis/"
 folder_in_m <- "data/processed/betareg_models/"
-folder_out <- "results/vis_betareg_residuals/"
+folder_out <- "results/vis_models_v1/betareg/vis_betareg_residuals/"
 
 
 # load data ---------------------------------------------------------------

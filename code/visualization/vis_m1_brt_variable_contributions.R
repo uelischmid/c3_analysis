@@ -8,7 +8,7 @@ library(gbm)
 library(dismo)
 
 folder_in <- "data/processed/brt_models/"
-folder_out <- "results/vis_brt_varcont/"
+folder_out <- "results/vis_models_v1/brt/vis_brt_varcont/"
 
 # load data ---------------------------------------------------------------
 models_full <- read_rds(str_c(folder_in, "models_full.rds"))

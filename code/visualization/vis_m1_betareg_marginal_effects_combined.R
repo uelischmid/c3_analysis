@@ -9,7 +9,7 @@ library(margins)
 
 folder_in_d <- "data/processed/analysis/"
 folder_in_m <- "data/processed/betareg_models/"
-folder_out <- "results/vis_betareg_marginal_effects_combined/"
+folder_out <- "results/vis_models_v1/betareg/vis_betareg_marginal_effects_combined/"
 
 
 # load data ---------------------------------------------------------------
