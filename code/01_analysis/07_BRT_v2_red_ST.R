@@ -70,7 +70,7 @@ models <- vector(mode = "list", length = nrow(model_combinations))
 models_cvstats <- models
 
 for (i in seq_along(models)) {
-  i <- i + 1
+  # i <- i + 1
   vals <- model_combinations[i, ]
   set.seed(1)
   mod <- gbm.step(data            = get(pull(vals, data_in)),
@@ -87,8 +87,9 @@ for (i in seq_along(models)) {
   models[[i]] <- mod
   
   models_cvstats[[i]] <- vals %>% 
-    dplyr::select(simtype:resp_var_type) %>% 
-    bind_cols(bind_cols(mod$cv.statistics))
+    # dplyr::select(simtype:init) %>% 
+    bind_cols(bind_cols(mod$cv.statistics)) %>% 
+    mutate(n_trees = length(mod$trees))
 }
 
 models_cvstats <- bind_rows(models_cvstats)
