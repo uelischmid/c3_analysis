@@ -1,6 +1,7 @@
 ## visualize effects of betareg-models
-# red LT combined
-## 27.2.23, us
+# red ST combined
+# variant 1 (all predictors)
+## 28.2.23, us
 
 
 # setup -------------------------------------------------------------------
@@ -11,27 +12,29 @@ library(cowplot)
 
 folder_in_d <- "data/processed/nais_analysis_data/"
 folder_in_m <- "data/processed/betareg_models_v2/"
-folder_out <- "results/vis_models_v2/betareg/vis_betareg_red_effects_combined/"
+folder_out <- "results/vis_models_v2/betareg/vis_betareg_red_effects_combined_1/"
 
 
 # load data ---------------------------------------------------------------
 data_analysis <- read_rds(str_c(folder_in_d, "analysis_data_transf.rds")) %>% 
   filter(q_reg2 == "normal")
 
-# subset data and save as new objects
-data_comb <- expand_grid(simtype = "LT",
+data_comb <- expand_grid(simtype = "ST",
                          nat_haz = c("A", "LED"),
-                         stratum = c("UM", "HM", "SA"))
+                         stratum = c("UM", "HM", "SA"),
+                         init    = c("1", "2", "3"))
 for (i in 1:nrow(data_comb)) {
   vals <- data_comb[i,]
   object_name <- str_c("data_",
                        pull(vals, simtype), "_",
                        pull(vals, nat_haz), "_",
-                       pull(vals, stratum))
+                       pull(vals, stratum), "_",
+                       pull(vals, init))
   object_content <- data_analysis %>% 
     filter(simtype == pull(vals, simtype)) %>% 
     filter(nat_haz == pull(vals, nat_haz)) %>% 
-    filter(stratum == pull(vals, stratum))
+    filter(stratum == pull(vals, stratum)) %>% 
+    filter(init    == pull(vals, init))
   
   assign(object_name, object_content)
 }
@@ -40,8 +43,8 @@ rm(object_name, object_content)
 
 
 # load models -------------------------------------------------------------
-models <- read_rds(str_c(folder_in_m, "models_red_LT.rds"))
-model_combinations <- read_rds(str_c(folder_in_m, "model_combinations_red_LT.rds")) %>% 
+models <- read_rds(str_c(folder_in_m, "models_red_ST.rds"))
+model_combinations <- read_rds(str_c(folder_in_m, "model_combinations_red_ST.rds")) %>% 
   rowid_to_column()
 
 
@@ -97,7 +100,7 @@ plot_predictorname <- function(name) {
   return(gg_p)
 }
 
-plot_effects_comb <- function(st, rvt, stra,
+plot_effects_comb <- function(st, rvt, stra, i_sel,
                               m_all  = models,
                               mc_all = model_combinations,
                               f_out  = folder_out) {
@@ -136,7 +139,8 @@ plot_effects_comb <- function(st, rvt, stra,
   mc_used <- mc_all %>% 
     filter(simtype == st) %>% 
     filter(resp_var_type == rvt) %>% 
-    filter(stratum == stra)
+    filter(stratum == stra) %>% 
+    filter(init == i_sel)
   
   # calculate effects
   effs_quality <- get_eff(mod  = m_all,
@@ -205,6 +209,7 @@ plot_effects_comb <- function(st, rvt, stra,
   }
   
   # name plots
+  p_title_plot <- plot_profilename(str_c(st, rvt, stra, i_sel, sep = " "))
   p_title_MP <- plot_profilename("Minimal Profile")
   p_title_IP <- plot_profilename("Ideal Profile")
   p_title_quality <- plot_predictorname("Site quality")
@@ -383,53 +388,57 @@ plot_effects_comb <- function(st, rvt, stra,
   
   
   # plot together
-  plots <- vector(mode = "list", length = 20)
+  plots <- vector(mode = "list", length = 24)
   
-  plots[[2]] <- p_title_MP
-  plots[[3]] <- p_title_IP
-  plots[[5]] <- p_title_quality
-  plots[[6]] <- p_quality_MP
-  plots[[7]] <- p_quality_IP
-  plots[[8]] <- p_legend_nathaz1
-  plots[[9]] <- p_title_type
-  plots[[10]] <- p_type_MP
-  plots[[11]] <- p_type_IP
-  plots[[13]] <- p_title_intint1
-  plots[[14]] <- p_intint1_MP
-  plots[[15]] <- p_intint1_IP
-  plots[[16]] <- p_legend_nathaz2
-  plots[[17]] <- p_title_intint2
-  plots[[18]] <- p_intint2_MP
-  plots[[19]] <- p_intint2_IP
+  plots[[2]] <- p_title_plot
+  plots[[6]] <- p_title_MP
+  plots[[7]] <- p_title_IP
+  plots[[9]] <- p_title_quality
+  plots[[10]] <- p_quality_MP
+  plots[[11]] <- p_quality_IP
+  plots[[12]] <- p_legend_nathaz1
+  plots[[13]] <- p_title_type
+  plots[[14]] <- p_type_MP
+  plots[[15]] <- p_type_IP
+  plots[[17]] <- p_title_intint1
+  plots[[18]] <- p_intint1_MP
+  plots[[19]] <- p_intint1_IP
+  plots[[20]] <- p_legend_nathaz2
+  plots[[21]] <- p_title_intint2
+  plots[[22]] <- p_intint2_MP
+  plots[[23]] <- p_intint2_IP
   
   gg_out <- plot_grid(plotlist    = plots,
                       align       = "h",
                       axis        = "lr",
                       ncol        = 4,
-                      rel_heights = c(0.25, 1, 1, 2, 2),
+                      rel_heights = c(0.25, 0.25, 1, 1, 2, 2),
                       rel_widths  = c(0.15, 1, 1, 0.4))
   
   ggsave(filename = str_c(f_out,
                           st, "_",
                           rvt, "_",
-                          stra, ".jpg"),
+                          stra, "_",
+                          i_sel, ".jpg"),
          plot     = gg_out,
          width    = 20,
-         height   = 30,
+         height   = 32,
          units    = "cm",
          scale    = 1)
 }
 
 
 # plot --------------------------------------------------------------------
-plot_combinations <- expand_grid(simtype       = "LT",
+plot_combinations <- expand_grid(simtype       = "ST",
                                  resp_var_type = c("abs", "diff"),
-                                 stratum       = c("UM", "HM", "SA"))
+                                 stratum       = c("UM", "HM", "SA"),
+                                 init          = c("1", "2", "3"))
 
 for (i in 1:nrow(plot_combinations)) {
   cat("\r", i, "/", nrow(plot_combinations))
   vals <- plot_combinations[i, ]
   plot_effects_comb(st    = pull(vals, simtype),
                     rvt   = pull(vals, resp_var_type),
-                    stra  = pull(vals, stratum))
+                    stra  = pull(vals, stratum),
+                    i_sel = pull(vals, init))
 }
