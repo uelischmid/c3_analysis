@@ -89,6 +89,8 @@ for (i in seq_along(models)) {
     mutate(n_trees = length(mod$trees))
 }
 
+map(models, "n.trees")
+
 models_cvstats <- bind_rows(models_cvstats)
 
 summary(models_cvstats)
@@ -101,11 +103,11 @@ ggplot(models_cvstats, aes(simtype, correlation.mean)) +
   geom_boxplot() +
   facet_wrap(~resp_var_type)
 
+
 write_rds(models,
           str_c(folder_out, "models_red_LT.rds"))
 write_rds(models_cvstats,
           str_c(folder_out, "models_cvstats_red_LT.rds"))
 write_rds(model_combinations,
           str_c(folder_out, "model_combinations_red_LT.rds"))
-
 

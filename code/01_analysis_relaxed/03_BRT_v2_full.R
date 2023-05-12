@@ -89,6 +89,8 @@ for (i in seq_along(models)) {
     mutate(n_trees = length(mod$trees))
 }
 
+map(models, "n.trees")
+
 models_cvstats <- bind_rows(models_cvstats)
 
 summary(models_cvstats)
