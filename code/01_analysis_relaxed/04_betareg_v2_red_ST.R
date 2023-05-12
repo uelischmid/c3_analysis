@@ -33,7 +33,9 @@ for (i in 1:nrow(data_comb)) {
     filter(simtype == pull(vals, simtype)) %>% 
     filter(nat_haz == pull(vals, nat_haz)) %>% 
     filter(stratum == pull(vals, stratum)) %>% 
-    filter(init    == pull(vals, init))
+    filter(init    == pull(vals, init)) %>% 
+    mutate(sha_i_MP_met_abs_t = (sha_i_MP_met_abs * (nrow(.)- 1) + 0.5) / nrow(.),
+           sha_i_IP_met_abs_t = (sha_i_IP_met_abs * (nrow(.)- 1) + 0.5) / nrow(.))
   
   assign(object_name, object_content)
 }
@@ -60,9 +62,9 @@ for (i in 1:nrow(model_combinations)) {
   # response variable
   if (pull(vals, resp_var_type) == "abs") {
     if (pull(vals, profile) == "MP") {
-      m_resp_var <- "sha_i_MP_met_abs"
+      m_resp_var <- "sha_i_MP_met_abs_t"
     } else {
-      m_resp_var <- "sha_i_IP_met_abs"
+      m_resp_var <- "sha_i_IP_met_abs_t"
     }
   } else {
     if (pull(vals, profile) == "MP") {
