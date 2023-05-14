@@ -15,15 +15,12 @@ folder_out <- "data/processed/nais_analysis_data/"
 # load data ---------------------------------------------------------------
 LT_orig <- read_rds(str_c(folder_in, "LT_relaxed.rds")) %>% 
   mutate(simtype = "LT")
-# ST_orig <- read_rds(str_c(folder_in, "ST_relaxed.rds")) %>% 
-#   mutate(simtype = "ST")
+ST_orig <- read_rds(str_c(folder_in, "ST_relaxed.rds")) %>%
+  mutate(simtype = "ST")
 
-# temp
-comb_orig <- LT_orig %>% 
-  select(-c(sha_y_MP_met, sha_y_IP_met, mean_i_total, neg_dist_MP, neg_dist_IP))
 # def
-# comb_orig <- bind_rows(LT_orig, ST_orig) %>% 
-#   select(-c(sha_y_MP_met, sha_y_IP_met, mean_i_total, neg_dist_MP, neg_dist_IP))
+comb_orig <- bind_rows(LT_orig, ST_orig) %>%
+  select(-c(sha_y_MP_met, sha_y_IP_met, mean_i_total, neg_dist_MP, neg_dist_IP))
 
 
 # calculate alternative response variable (diff NOM) ----------------------
