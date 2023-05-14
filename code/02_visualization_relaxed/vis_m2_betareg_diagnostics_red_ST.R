@@ -50,7 +50,7 @@ model_combinations <- read_rds(str_c(folder_in_m, "model_combinations_red_ST.rds
 
 # plot --------------------------------------------------------------------
 for (i in 1:nrow(model_combinations)) {
-  if (i %in% c(18, 36, 70, 72)) next # Error on these models: "system is computationally singular"
+  if (i %in% c(18, 36, 54, 70, 72)) next # Error on these models: "system is computationally singular"
   
   vals <- model_combinations[i,]
   
