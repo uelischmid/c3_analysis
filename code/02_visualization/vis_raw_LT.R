@@ -5,8 +5,8 @@
 library(tidyverse)
 library(cowplot)
 
-folder_in <- "data/raw/nais_analysis/"
-folder_out <- "results/raw_data/vis_LT/"
+folder_in <- "data/raw/nais_analysis_data/"
+folder_out <- "results/vis_raw_data/vis_LT/"
 
 source("code/02_visualization/vis_functions.R")
 
@@ -34,7 +34,7 @@ for (i in 1:nrow(plot_combinations)) {
                              nathaz_sel   = plot_combinations[[i, "nat_haz"]],
                              resp_var_sel = plot_combinations[[i, "resp_var"]],
                              res          = LT)
-  ggsave(filename = str_c(folder_out, "LT_",
+  ggsave(filename = str_c(folder_out, "4_scales/", plot_combinations[[i, "resp_var"]], "/LT_",
                           plot_combinations[[i, "stratum"]], "_",
                           plot_combinations[[i, "nat_haz"]], "_",
                           plot_combinations[[i, "resp_var"]], "_4cs.jpg"),
@@ -48,7 +48,7 @@ for (i in 1:nrow(plot_combinations)) {
                              resp_var_sel = plot_combinations[[i, "resp_var"]],
                              res          = LT)
   
-  ggsave(filename = str_c(folder_out, "LT_",
+  ggsave(filename = str_c(folder_out, "1_scale/", plot_combinations[[i, "resp_var"]], "/LT_",
                           plot_combinations[[i, "stratum"]], "_",
                           plot_combinations[[i, "nat_haz"]], "_",
                           plot_combinations[[i, "resp_var"]], "_1cs.jpg"),

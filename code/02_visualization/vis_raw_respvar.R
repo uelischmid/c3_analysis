@@ -7,14 +7,15 @@ library(tidyverse)
 library(cowplot)
 
 folder_in <- "data/processed/nais_analysis_data/"
-folder_out <- "results/raw_data/vis_respvar/"
+folder_out <- "results/vis_raw_data/vis_respvar/"
 
 
 # load data ---------------------------------------------------------------
 comb <- read_rds(str_c(folder_in, "analysis_data_transf.rds"))
-respvar_names <- colnames(comb)[15:28]
+respvar_names <- colnames(comb)[15:18]
 comb <- comb %>% 
-  pivot_longer(cols      = sha_i_MP_met_abs:sha_y_IP_met_diff,
+  select(simtype:sha_i_IP_met_diff) %>% 
+  pivot_longer(cols      = sha_i_MP_met_abs:sha_i_IP_met_diff,
                names_to  = "resp_var",
                values_to = "value") %>% 
   mutate(resp_var = factor(resp_var, levels = respvar_names))
