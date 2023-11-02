@@ -40,7 +40,7 @@ plot_vi <- function(m_all, mc_all,
   
   contributions <- bind_rows(contributions) %>% 
     mutate(var   = str_replace_all(var,
-                                   c("stratum"       = "Stratum",
+                                   c("stratum"       = "Zone",
                                      "q_reg2"        = "Qreg",
                                      "q_site2"       = "Qsite",
                                      "mgm_type"      = "Type",
