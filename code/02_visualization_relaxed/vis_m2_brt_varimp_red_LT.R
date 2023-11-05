@@ -48,14 +48,15 @@ plot_vi <- function(st, rv,
                                      "mgm_interval"  = "Interval",
                                      "mgm_intensity" = "Intensity")))
   
-  var_order <- contributions %>% 
-    group_by(var) %>% 
-    summarise(m_inf = mean(rel.inf)) %>% 
-    arrange(desc(m_inf)) %>% 
-    pull(var)
+  # var_order <- contributions %>% 
+  #   group_by(var) %>% 
+  #   summarise(m_inf = mean(rel.inf)) %>% 
+  #   arrange(desc(m_inf)) %>% 
+  #   pull(var)
   
   contributions <- contributions %>% 
-    mutate(var     = factor(var, levels = var_order),
+    mutate(# var     = factor(var, levels = var_order),$
+           var     = factor(var, levels = c("Type", "Interval", "Intensity", "Qsite")),
            var     = fct_rev(var),
            nat_haz = factor(nat_haz, levels = c("A", "LED")),
            nat_haz = fct_rev(nat_haz),

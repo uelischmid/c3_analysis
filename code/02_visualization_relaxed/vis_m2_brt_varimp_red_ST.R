@@ -47,24 +47,27 @@ plot_vi <- function(st, rv,
                                    c("q_site2"       = "Qsite",
                                      "mgm_type"      = "Type",
                                      "mgm_interval"  = "Interval",
-                                     "mgm_intensity" = "Intensity")))
+                                     "mgm_intensity" = "Intensity")),
+           init2 = case_when(init == "1" ~ "young",
+                             init == "2" ~ "structured",
+                             TRUE        ~ "mature"))
   
-  var_order <- contributions %>% 
-    group_by(var) %>% 
-    summarise(m_inf = mean(rel.inf)) %>% 
-    arrange(desc(m_inf)) %>% 
-    pull(var)
+  # var_order <- contributions %>% 
+  #   group_by(var) %>% 
+  #   summarise(m_inf = mean(rel.inf)) %>% 
+  #   arrange(desc(m_inf)) %>% 
+  #   pull(var)
   
   contributions <- contributions %>% 
-    mutate(var     = factor(var, levels = var_order),
+    mutate(# var     = factor(var, levels = var_order),
+           var     = factor(var, levels = c("Type", "Interval", "Intensity", "Qsite")),
            var     = fct_rev(var),
            nat_haz = factor(nat_haz, levels = c("A", "LED")),
            nat_haz = fct_rev(nat_haz),
            profile = factor(profile, levels = c("MP", "IP")),
            profile = fct_rev(profile),
            stratum = factor(stratum, levels = c("UM", "HM", "SA")),
-           init    = factor(init, levels = c("1", "2", "3"))) %>% 
-    rename(Stratum = stratum, Init = init)
+           init2   = factor(init2, levels = c("young", "structured", "mature")))
   
   title_str <- str_c(st, " - ", rv)
   
@@ -76,9 +79,8 @@ plot_vi <- function(st, rv,
                          guide = guide_legend(reverse = TRUE)) +
     scale_fill_discrete(type = c("#cccccc", "#525252"),
                         guide = guide_legend(reverse = TRUE)) +
-    facet_grid(rows     = vars(Init),
-               cols     = vars(Stratum),
-               labeller = "label_both") +
+    facet_grid(rows     = vars(init2),
+               cols     = vars(stratum)) +
     labs(title = title_str,
          x     = NULL,
          y     = "Variable importance (%)",
