@@ -20,6 +20,11 @@ ST_NOM_red <- read_rds(str_c(path_in, "ST_relaxed.rds")) %>%
   filter(mgm == "NOM") %>% 
   select(stratum, init, q_site, nat_haz, sha_i_MP_met, sha_i_IP_met)
 
+NOM_red <- LT_NOM_red %>% 
+  mutate(init = "LT") %>% 
+  select(stratum, init, everything()) %>% 
+  bind_rows(ST_NOM_red)
+
 # transform data ----------------------------------------------------------
 LT_NOM_red_t <- LT_NOM_red %>%
   mutate(stratum = factor(stratum, levels = c("UM", "HM", "SA")),
@@ -51,6 +56,24 @@ ST_NOM_red_t <- ST_NOM_red %>%
   mutate(profile = str_sub(profile, 7, 8),
          profile = factor(profile, levels = c("MP", "IP")))
 
+
+NOM_red_t <- NOM_red %>%
+  mutate(stratum = factor(stratum, levels = c("UM", "HM", "SA")),
+         init2   = case_when(init == "1" ~ "ST: young",
+                             init == "2" ~ "ST: structured",
+                             init == "3" ~ "ST: mature",
+                             TRUE        ~ "LT"),
+         init2   = factor(init2, levels = c("ST: young", "ST: structured", "ST: mature", "LT")),
+         q_site2 = case_when(q_site == 3 ~ "medium",
+                             TRUE        ~ "good"),
+         q_site2 = factor(q_site2, levels = c("good", "medium")),
+         nat_haz = factor(nat_haz, levels = c("A", "LED"))) %>% 
+  select(stratum, init2, q_site2, nat_haz, sha_i_MP_met, sha_i_IP_met) %>% 
+  pivot_longer(cols      = sha_i_MP_met:sha_i_IP_met,
+               names_to  = "profile",
+               values_to = "pv") %>% 
+  mutate(profile = str_sub(profile, 7, 8),
+         profile = factor(profile, levels = c("MP", "IP")))
 
 # plot --------------------------------------------------------------------
 # LT
@@ -87,6 +110,26 @@ gg_ST <- ggplot(ST_NOM_red_t, aes(profile, pv, color = nat_haz, shape = q_site2)
 
 ggsave(filename = str_c(path_out, "NOM_red_ST.jpg"),
        plot     = gg_ST,
+       width    = 15,
+       height   = 16,
+       units    = "cm",
+       scale    = 1)
+
+# both
+gg_both <- ggplot(NOM_red_t, aes(profile, pv, color = nat_haz, shape = q_site2)) +
+  geom_point(position = position_dodge2(w = 0.5)) +
+  facet_grid(cols = vars(stratum),
+             rows = vars(init2)) +
+  scale_y_continuous(labels = scales::percent)+
+  labs(x     = NULL,
+       y     = "Profile met (%)",
+       color = "Natural\nhazard",
+       shape = "Site\nquality") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank())
+
+ggsave(filename = str_c(path_out, "NOM_red_both.jpg"),
+       plot     = gg_both,
        width    = 15,
        height   = 16,
        units    = "cm",
