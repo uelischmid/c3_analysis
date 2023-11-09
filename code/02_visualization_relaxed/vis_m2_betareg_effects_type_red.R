@@ -122,17 +122,16 @@ plot_eff_type <- function(stra, pro,
                                   "ST: mature"     = "3"))
   
   gg <- ggplot(effs, aes(x, predicted, color = nat_haz)) +
-    geom_point(position = position_dodge(width = 0.2)) +
+    geom_point(position = position_dodge(width = 0.4)) +
     geom_errorbar(aes(ymin = conf.low,
                       ymax = conf.high),
                   width    = 0.25,
-                  position = position_dodge(width = 0.2)) +
+                  position = position_dodge(width = 0.4)) +
     geom_hline(yintercept = 0,
                lty = 2) +
     labs(x     = "Management type",
          y     = "\u0394 PQ",
-         color = "Natural\nhazard",
-         title = str_c(stra, pro, "diff", sep = " ")) +
+         color = "Natural\nhazard") +
     facet_grid(cols = vars(init)) +
     theme_bw() +
     theme(panel.grid.minor = element_blank(),

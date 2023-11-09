@@ -135,8 +135,7 @@ plot_heatmap_intint <- function(stra, pro,
                          midpoint = 0) +
     labs(x     = "Interval (y)",
          y     = "Intensity (%)",
-         fill  = "\u0394 PQ",
-         title = str_c(stra, pro, "diff", sep = " ")) +
+         fill  = "\u0394 PQ") +
     facet_grid(rows = vars(nat_haz),
                cols = vars(init)) +
     coord_equal() +
@@ -148,7 +147,7 @@ plot_heatmap_intint <- function(stra, pro,
                           pro, "_diff.jpg"),
          plot     = gg,
          width    = 16,
-         height   = 10,
+         height   = 8,
          units    = "cm",
          scale    = 1)
 }

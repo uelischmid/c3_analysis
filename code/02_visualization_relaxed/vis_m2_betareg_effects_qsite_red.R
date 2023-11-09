@@ -122,17 +122,16 @@ plot_eff_sq <- function(stra,
            profile   = factor(profile, levels = c("MP", "IP")))
   
   gg <- ggplot(effs, aes(x, predicted, color = nat_haz)) +
-    geom_point(position = position_dodge(width = 0.2)) +
+    geom_point(position = position_dodge(width = 0.3)) +
     geom_errorbar(aes(ymin = conf.low,
                       ymax = conf.high),
                   width    = 0.25,
-                  position = position_dodge(width = 0.2)) +
+                  position = position_dodge(width = 0.3)) +
     geom_hline(yintercept = 0,
                lty = 2) +
     labs(x     = expression(Q[site]),
          y     = "\u0394 PQ",
-         color = "Natural\nhazard",
-         title = str_c(stra, "diff", sep = " ")) +
+         color = "Natural\nhazard") +
     facet_grid(rows = vars(profile),
                cols = vars(init)) +
     theme_bw() +
@@ -142,7 +141,7 @@ plot_eff_sq <- function(stra,
                           stra, "_diff.jpg"),
          plot     = gg,
          width    = 16,
-         height   = 10,
+         height   = 9,
          units    = "cm",
          scale    = 1)
 }
