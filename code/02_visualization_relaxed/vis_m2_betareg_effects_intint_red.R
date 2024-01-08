@@ -129,9 +129,9 @@ plot_heatmap_intint <- function(stra, pro,
   
   gg <- ggplot(effs, aes(interval, intensity, fill = predicted)) +
     geom_tile() +
-    scale_fill_gradient2(low      = "#732603",
-                         mid      = "#ffffbf",
-                         high     = "#037317",
+    scale_fill_gradient2(low      = "#ff0000",
+                         mid      = "#ffffff",
+                         high     = "#004a8d",
                          midpoint = 0) +
     labs(x     = "Interval (y)",
          y     = "Intensity (%)",
