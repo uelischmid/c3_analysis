@@ -1,11 +1,12 @@
 # visualize protective function of NOM-mgm
 # relaxed assessment
-# 5.11.23
+# 1 graph per stratum
+# 15.1.24
 
 # setup -------------------------------------------------------------------
 library(tidyverse)
 path_in <- "data/raw/nais_analysis_data/"
-path_out <- "results/vis_raw_data_relaxed/vis_NOM_red/"
+path_out <- "results/vis_raw_data_relaxed/vis_NOM_red2/"
 
 # load data ---------------------------------------------------------------
 LT_NOM_red <- read_rds(str_c(path_in, "LT_relaxed.rds")) %>% 
@@ -76,61 +77,30 @@ NOM_red_t <- NOM_red %>%
          profile = factor(profile, levels = c("MP", "IP")))
 
 # plot --------------------------------------------------------------------
-# LT
-gg_LT <- ggplot(LT_NOM_red_t, aes(profile, pv, color = nat_haz, shape = q_site2)) +
-  geom_point(position = position_dodge2(w = 0.5)) +
-  facet_grid(cols = vars(stratum)) +
-  scale_y_continuous(labels = scales::percent)+
-  labs(x     = NULL,
-       y     = "Profile met (%)",
-       color = "Natural\nhazard",
-       shape = "Site\nquality") +
-  theme_bw() +
-  theme(panel.grid.minor = element_blank())
+plot_nom <- function(stra,
+                     df = NOM_red_t, p_out = path_out) {
+  gg_out <- df %>% 
+    filter(stratum == stra) %>% 
+    ggplot(aes(profile, pv, color = nat_haz, shape = q_site2)) +
+    geom_point(position = position_dodge2(w = 0.5)) +
+    facet_grid(cols = vars(init2)) +
+    scale_y_continuous(labels = scales::percent,
+                       limits = c(0, 1))+
+    labs(x     = NULL,
+         y     = "Profile met (%)",
+         color = "Natural\nhazard",
+         shape = "Site\nquality") +
+    theme_bw() +
+    theme(panel.grid.minor = element_blank())
+  
+  ggsave(filename = str_c(p_out, "NOM_red_", stra, ".jpg"),
+         plot     = gg_out,
+         width    = 15,
+         height   = 5,
+         units    = "cm",
+         scale    = 1.5)
+}
 
-ggsave(filename = str_c(path_out, "NOM_red_LT.jpg"),
-       plot     = gg_LT,
-       width    = 15,
-       height   = 6,
-       units    = "cm",
-       scale    = 1)
-
-# ST
-gg_ST <- ggplot(ST_NOM_red_t, aes(profile, pv, color = nat_haz, shape = q_site2)) +
-  geom_point(position = position_dodge2(w = 0.5)) +
-  facet_grid(cols = vars(stratum),
-             rows = vars(init2)) +
-  scale_y_continuous(labels = scales::percent)+
-  labs(x     = NULL,
-       y     = "Profile met (%)",
-       color = "Natural\nhazard",
-       shape = "Site\nquality") +
-  theme_bw() +
-  theme(panel.grid.minor = element_blank())
-
-ggsave(filename = str_c(path_out, "NOM_red_ST.jpg"),
-       plot     = gg_ST,
-       width    = 15,
-       height   = 16,
-       units    = "cm",
-       scale    = 1)
-
-# both
-gg_both <- ggplot(NOM_red_t, aes(profile, pv, color = nat_haz, shape = q_site2)) +
-  geom_point(position = position_dodge2(w = 0.5)) +
-  facet_grid(cols = vars(stratum),
-             rows = vars(init2)) +
-  scale_y_continuous(labels = scales::percent)+
-  labs(x     = NULL,
-       y     = "Profile met (%)",
-       color = "Natural\nhazard",
-       shape = "Site\nquality") +
-  theme_bw() +
-  theme(panel.grid.minor = element_blank())
-
-ggsave(filename = str_c(path_out, "NOM_red_both.jpg"),
-       plot     = gg_both,
-       width    = 15,
-       height   = 16,
-       units    = "cm",
-       scale    = 1)
+plot_nom("UM")
+plot_nom("HM")
+plot_nom("SA")
