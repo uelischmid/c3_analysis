@@ -155,7 +155,7 @@ plot_mgm_4cs_red2 <- function(stratum_selected,
     geom_point(data = dat_red_best, color = "green", size = 4) +
     geom_point(size = 3) +
     scale_color_gradient2(low      = "#ff0000",
-                          mid      = "#ffffff",
+                          mid      = "#B2BEB5",
                           high     = "#004a8d",
                           midpoint = mp) +
     facet_wrap(~ mgm) +
