@@ -152,11 +152,11 @@ plot_mgm_4cs_red2 <- function(stratum_selected,
   gg <- ggplot(dat_red, aes(x     = mgm_interval,
                             y     = mgm_intensity,
                             color = .data[[response_var]])) +
-    geom_point(data = dat_red_best, color = "blue", size = 4) +
+    geom_point(data = dat_red_best, color = "green", size = 4) +
     geom_point(size = 3) +
-    scale_color_gradient2(low      = "red",
-                          mid      = "yellow",
-                          high     = "green",
+    scale_color_gradient2(low      = "#ff0000",
+                          mid      = "#ffffff",
+                          high     = "#004a8d",
                           midpoint = mp) +
     facet_wrap(~ mgm) +
     labs(title = str_c(title_part, " Q", quality_selected),
