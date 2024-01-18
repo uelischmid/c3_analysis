@@ -107,32 +107,54 @@ get_eff <- function(mod, mc, term) {
   return(effs)
 }
 
-plot_effs <- function(stra, st_init, qsite,
+plot_effs <- function(stra, st_init,
                       m_all  = models,
                       mc_all = model_combinations,
                       f_out  = folder_out) {
   
   
   # effects
-  term_qsite <- str_c("q_site2 [", qsite, "]")
-  effs_type <- get_eff(mod  = m_all,
-                       mc   = mc_all %>% 
-                         filter(stratum == stra) %>% 
-                         filter(init == st_init) %>% 
-                         filter(resp_var_type == "diff"),
-                       term = c("mgm_type",
-                                term_qsite)) %>% 
-    mutate(profile  = factor(profile, levels = c("MP", "IP")))
-  
-  
-  effs_intint <- get_eff(mod  = m_all,
+  effs_type_g <- get_eff(mod  = m_all,
                          mc   = mc_all %>% 
                            filter(stratum == stra) %>% 
                            filter(init == st_init) %>% 
                            filter(resp_var_type == "diff"),
-                         term = c("mgm_interval [10:40]",
-                                  "mgm_intensity [10:40]",
-                                  term_qsite)) %>% 
+                         term = c("mgm_type",
+                                  "q_site2 [good]")) %>% 
+    mutate(profile  = factor(profile, levels = c("MP", "IP")))
+  
+  effs_type_m <- get_eff(mod  = m_all,
+                         mc   = mc_all %>% 
+                           filter(stratum == stra) %>% 
+                           filter(init == st_init) %>% 
+                           filter(resp_var_type == "diff"),
+                         term = c("mgm_type",
+                                  "q_site2 [medium]")) %>% 
+    mutate(profile  = factor(profile, levels = c("MP", "IP")))
+  
+  
+  effs_intint_g <- get_eff(mod  = m_all,
+                           mc   = mc_all %>% 
+                             filter(stratum == stra) %>% 
+                             filter(init == st_init) %>% 
+                             filter(resp_var_type == "diff"),
+                           term = c("mgm_interval [10:40]",
+                                    "mgm_intensity [10:40]",
+                                    "q_site2 [good]")) %>% 
+    rename(interval  = x,
+           intensity = group) %>% 
+    mutate(intensity = as.character(intensity),
+           intensity = as.numeric(intensity),
+           profile  = factor(profile, levels = c("MP", "IP")))
+  
+  effs_intint_m <- get_eff(mod  = m_all,
+                           mc   = mc_all %>% 
+                             filter(stratum == stra) %>% 
+                             filter(init == st_init) %>% 
+                             filter(resp_var_type == "diff"),
+                           term = c("mgm_interval [10:40]",
+                                    "mgm_intensity [10:40]",
+                                    "q_site2 [medium]")) %>% 
     rename(interval  = x,
            intensity = group) %>% 
     mutate(intensity = as.character(intensity),
@@ -140,14 +162,37 @@ plot_effs <- function(stra, st_init, qsite,
            profile  = factor(profile, levels = c("MP", "IP")))
   
   
-  ylims_upper <- c(min(effs_type$conf.low),
-                   max(effs_type$conf.high))
-  if (ylims_upper[1] > 0) ylims_upper[1] <- 0
-  if (ylims_upper[2] < 0) ylims_upper[2] <- 0
+  ylims_type <- c(min(c(effs_type_g$conf.low, effs_type_m$conf.low)),
+                  max(c(effs_type_g$conf.high, effs_type_m$conf.high)))
+  if (ylims_type[1] > 0) ylims_type[1] <- 0
+  if (ylims_type[2] < 0) ylims_type[2] <- 0
   
+  ylims_intint <- c(min(c(effs_intint_g$predicted, effs_intint_m$predicted)),
+                    max(c(effs_intint_g$predicted, effs_intint_m$predicted)))
+  if (ylims_intint[1] > 0) ylims_intint[1] <- 0
+  if (ylims_intint[2] < 0) ylims_intint[2] <- 0
+  
+  # plot titles
+  gg_title_g <- ggplot() +
+    annotate(geom     = "text",
+             x        = 0,
+             y        = 0.5,
+             label    = expression(Q[site]*": good"),
+             angle    = 0,
+             fontface = "bold") +
+    theme_void()
+  
+  gg_title_m <- ggplot() +
+    annotate(geom     = "text",
+             x        = 0,
+             y        = 0.5,
+             label    = expression(Q[site]*": medium"),
+             angle    = 0,
+             fontface = "bold") +
+    theme_void()
   
   # plot type
-  gg_type_temp <- ggplot(effs_type, aes(x, predicted, color = nat_haz)) +
+  gg_type_g_temp <- ggplot(effs_type_g, aes(x, predicted, color = nat_haz)) +
     geom_hline(yintercept = 0,
                color      = "darkgrey") +
     geom_point(position = position_dodge(width = 0.2)) +
@@ -155,7 +200,7 @@ plot_effs <- function(stra, st_init, qsite,
                       ymax = conf.high),
                   width    = 0.25,
                   position = position_dodge(width = 0.2)) +
-    scale_y_continuous(limits = ylims_upper) +
+    scale_y_continuous(limits = ylims_type) +
     labs(x     = "Type",
          y     = "\u0394 PQ",
          color = "Natural\nhazard") +
@@ -163,19 +208,37 @@ plot_effs <- function(stra, st_init, qsite,
     theme_bw() +
     theme(panel.grid.minor = element_blank())
   
-  gg_type <- gg_type_temp +
+  gg_type_g <- gg_type_g_temp +
     theme(legend.position = "none")
   
-  legend_nathaz <- get_legend(gg_type_temp)
-    
+  legend_nathaz <- get_legend(gg_type_g_temp)
+  
+  
+  gg_type_m <- ggplot(effs_type_m, aes(x, predicted, color = nat_haz)) +
+    geom_hline(yintercept = 0,
+               color      = "darkgrey") +
+    geom_point(position = position_dodge(width = 0.2)) +
+    geom_errorbar(aes(ymin = conf.low,
+                      ymax = conf.high),
+                  width    = 0.25,
+                  position = position_dodge(width = 0.2)) +
+    scale_y_continuous(limits = ylims_type) +
+    labs(x     = "Type",
+         y     = "\u0394 PQ",
+         color = "Natural\nhazard") +
+    facet_grid(cols = vars(profile)) +
+    theme_bw() +
+    theme(panel.grid.minor = element_blank(),
+          legend.position  = "none")
   
   # plot heatmap intint
-  gg_intint_temp <- ggplot(effs_intint, aes(interval, intensity, fill = predicted)) +
+  gg_intint_g_temp <- ggplot(effs_intint_g, aes(interval, intensity, fill = predicted)) +
     geom_tile() +
     scale_fill_gradient2(low      = "#ff0000",
                          mid      = "#ffffff",
                          high     = "#004a8d",
-                         midpoint = 0) +
+                         midpoint = 0,
+                         limits   = ylims_intint) +
     labs(x     = "Interval (y)",
          y     = "Intensity (%)",
          fill  = "\u0394 PQ") +
@@ -185,31 +248,52 @@ plot_effs <- function(stra, st_init, qsite,
     theme_bw() +
     theme(panel.grid.minor = element_blank())
   
-  gg_intint <- gg_intint_temp +
+  gg_intint_g <- gg_intint_g_temp +
     theme(legend.position = "none")
   
-  legend_deltapq <- get_legend(gg_intint_temp)
+  legend_deltapq <- get_legend(gg_intint_g_temp)
+  
+  gg_intint_m <- ggplot(effs_intint_m, aes(interval, intensity, fill = predicted)) +
+    geom_tile() +
+    scale_fill_gradient2(low      = "#ff0000",
+                         mid      = "#ffffff",
+                         high     = "#004a8d",
+                         midpoint = 0,
+                         limits   = ylims_intint) +
+    labs(x     = "Interval (y)",
+         y     = "Intensity (%)",
+         fill  = "\u0394 PQ") +
+    facet_grid(rows = vars(nat_haz),
+               cols = vars(profile)) +
+    coord_equal() +
+    theme_bw() +
+    theme(panel.grid.minor = element_blank(),
+          legend.position = "none")
   
   # plot all
   plots <- list()
-  plots[[1]] <- gg_type
-  plots[[2]] <- legend_nathaz
-  plots[[3]] <- gg_intint
-  plots[[4]] <- legend_deltapq
-
+  plots[[1]] <- gg_title_g
+  plots[[2]] <- gg_title_m
+  plots[[4]] <- gg_type_g
+  plots[[5]] <- gg_type_m
+  plots[[6]] <- legend_nathaz
+  plots[[7]] <- gg_intint_g
+  plots[[8]] <- gg_intint_m
+  plots[[9]] <- legend_deltapq
+  
   gg_out <- plot_grid(plotlist = plots,
-            ncol = 2,
-            rel_heights = c(1, 2),
-            rel_widths = c(1, 0.2),
-            labels = c("a", "", "b", ""),
-            align = "v",
-            axis = c("lr"))
+                      ncol = 3,
+                      rel_heights = c(0.2, 1, 2),
+                      rel_widths = c(1, 1, 0.2),
+                      labels = c("", "", "", "a", "b", "", "c", "d", ""),
+                      align = "v",
+                      axis = c("lr"))
   
   ggsave(filename = str_c(f_out, "eff_comb_diff_",
                           stra, "_", st_init,
-                          "_qsite_", qsite, ".jpg"),
+                          "_qsite.jpg"),
          plot = gg_out,
-         width = 8,
+         width = 15,
          height = 7.5,
          units = "cm",
          scale = 2)
@@ -217,12 +301,10 @@ plot_effs <- function(stra, st_init, qsite,
 
 # plot --------------------------------------------------------------------
 plot_vars <- expand_grid(stratum    = c("UM", "HM", "SA"),
-                         stand_init = c("1", "2", "3", "LT"),
-                         qsite      = c("medium", "good"))
+                         stand_init = c("1", "2", "3", "LT"))
 
 for (i in 1:nrow(plot_vars)) {
   vars <- plot_vars[i, ]
   plot_effs(stra    = pull(vars, stratum),
-            st_init = pull(vars, stand_init),
-            qsite   = pull(vars, qsite))
+            st_init = pull(vars, stand_init))
 }
