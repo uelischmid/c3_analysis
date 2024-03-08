@@ -98,7 +98,7 @@ plot_nom <- function(stra,
          width    = 15,
          height   = 5,
          units    = "cm",
-         scale    = 1.5)
+         scale    = 1.3)
 }
 
 plot_nom("UM")

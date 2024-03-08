@@ -77,7 +77,7 @@ plot_vi <- function(simt,
          width = 16,
          height = 7,
          units = "cm",
-         scale = 2)
+         scale = 1.5)
 }
 
 

@@ -172,6 +172,7 @@ plot_effects_comb_mgm_qreg <- function(pr, rvt,
   # plot mgm type
   # ST
   gg_type_ST <- effs_mgm_type %>% 
+    mutate(group = fct_recode(group, good = "normal", low = "hindered")) %>% 
     rename(Qreg = group) %>% 
     filter(simtype == "ST") %>% 
     ggplot(aes(x, predicted, color = nat_haz)) +
@@ -192,6 +193,7 @@ plot_effects_comb_mgm_qreg <- function(pr, rvt,
     
   # LT
   gg_type_LT <- effs_mgm_type %>% 
+    mutate(group = fct_recode(group, good = "normal", low = "hindered")) %>% 
     rename(Qreg = group) %>% 
     filter(simtype == "LT") %>% 
     ggplot(aes(x, predicted, color = nat_haz)) +
@@ -214,6 +216,7 @@ plot_effects_comb_mgm_qreg <- function(pr, rvt,
   # plot intensity * interval interaction (x = interval)
   # ST
   gg_intint_ST <- effs_mgm_intint %>% 
+    mutate(facet = fct_recode(facet, good = "normal", low = "hindered")) %>% 
     rename(Intensity = group) %>% 
     filter(simtype == "ST") %>% 
     mutate(nhfa = str_c(nat_haz, facet)) %>% 
@@ -240,6 +243,7 @@ plot_effects_comb_mgm_qreg <- function(pr, rvt,
     
   # LT
   gg_intint_LT <- effs_mgm_intint %>% 
+    mutate(facet = fct_recode(facet, good = "normal", low = "hindered")) %>% 
     rename(Intensity = group) %>% 
     filter(simtype == "LT") %>% 
     mutate(nhfa = str_c(nat_haz, facet)) %>% 
@@ -319,6 +323,7 @@ theme_custom <- theme_bw() +
 # plot regeneration quality
 # plot abs
 p_qreg_abs <- effs_qual_reg %>% 
+  mutate(x = fct_recode(x, good = "normal", low = "hindered")) %>% 
   filter(rvt == "abs") %>% 
   ggplot(aes(x, predicted, color = nat_haz)) +
   geom_point(position = position_dodge(width = 0.2)) +
@@ -336,6 +341,7 @@ p_qreg_abs <- effs_qual_reg %>%
 
 # plot diff
 p_qreg_diff <- effs_qual_reg %>% 
+  mutate(x = fct_recode(x, good = "normal", low = "hindered")) %>% 
   filter(rvt == "diff") %>% 
   ggplot(aes(x, predicted, color = nat_haz)) +
   geom_hline(yintercept = 0, color = "darkgrey") +
